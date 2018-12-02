@@ -65,7 +65,7 @@ public class Controller {
         String corpus_path=this.corpus_path.getText();
         String destination=this.posting_destanation_path.getText();
         if(corpus_path.equals("")|| destination.equals(""))
-                 showAlert("please enter corpus path and Posting & Dictionary Destanation");
+                 showAlert("please enter corpus path and Posting & Dictionary Destination");
         else {
             viewModel.start(corpus_path, destination, wantToStem);
             long finishTime 	= System.nanoTime();
