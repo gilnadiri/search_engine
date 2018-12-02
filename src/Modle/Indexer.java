@@ -26,6 +26,7 @@ public class Indexer {
         PostingNum = 0;
         this.CorpusPath=corpusPath;
         this.Posting_And_dictionary_path_in_disk=Posting_And_dictionary_path_in_disk;
+
     }
 
     /**
@@ -47,6 +48,11 @@ public class Indexer {
 
             boolean left=true;
             for (int i = 0; i < Dirs.length; i++) {
+                if(Dirs[i].getName().equals("stop_words.txt")) {
+                    coun--;
+                    continue;
+                }
+
 
                 File temp = Dirs[i];
                 File[] currDir = temp.listFiles();

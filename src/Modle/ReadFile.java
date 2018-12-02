@@ -24,6 +24,8 @@ public class ReadFile {
         File[] Dirs = Main.listFiles();
         HashMap<String,City> allcities=new HashMap<>();
         for (int i = 0; i < Dirs.length; i++) {
+            if(Dirs[i].getName().equals("stop_words.txt"))
+                continue;
             File temp = Dirs[i];
             File[] currDir = temp.listFiles();
             File currFile = currDir[0];
