@@ -298,7 +298,7 @@ public class Parse {
                 continue;
             }
 
-            if (A__B_Shape(token0)) {//////our role???
+            if (A__B_Shape(token0)) {//////our role
                 String[] toadd = token0.split("--");
                 justAdd(toadd[0]);
                 justAdd(toadd[1]);
@@ -495,6 +495,12 @@ public class Parse {
                     returnValue++;
                 }
                 else w2=arr[1];
+            }
+            //our role
+            else if(arr[1].equals("percent")||arr[1].equals("percentage")){
+                justAdd(w1+"%");
+                returnValue++;
+                return returnValue;
             }
 
             else
