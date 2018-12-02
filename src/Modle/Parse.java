@@ -20,13 +20,13 @@ public class Parse {
 
 
 
-    public Parse(String corpus_path) {
+    public Parse(String courpus_path) {
         Tokens = new HashMap<>();
         cities=new HashMap<>();
         stop_words=new HashSet<>();
         allJson=new Cities();
         try {
-            File file = new File(corpus_path + "\\" + "stop_words.txt");
+            File file = new File(courpus_path + "\\" + "stop_words.txt");
             BufferedReader br = new BufferedReader(new FileReader(file));
             String str = "";
             while ((str = br.readLine()) != null) {

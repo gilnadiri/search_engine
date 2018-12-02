@@ -41,10 +41,19 @@ public class Indexer {
             parser.setCities(cities_index);
 
             File Main = new File(CorpusPath);
-            File[] Dirs = Main.listFiles();
+            File[] DirsAndSW = Main.listFiles();
             //build all the tmp posting files-1 temporary posting file per 40 files
             int coun=40;
             List<Map<Documentt,String>> fortyFiles=new ArrayList<>();
+
+            int j=0;
+            File[] Dirs=new File[DirsAndSW.length-1];
+            for (int i = 0; i < DirsAndSW.length; i++) {
+                if (!DirsAndSW[i].getName().equals("stop_words.txt")) {
+                    Dirs[j]=DirsAndSW[i];
+                    j++;
+                }
+            }
 
             boolean left=true;
             for (int i = 0; i < Dirs.length; i++) {
@@ -527,6 +536,18 @@ public class Indexer {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+    }
+
+    public int numOfDocs() {
+        return documents.size();
+    }
+
+    public int numOfTerms() {
+        return dictionary.size();
+    }
+
+    public int numOfCities() {
+        return cities_index.size();
     }
     //</editor-fold>
 

@@ -69,7 +69,11 @@ public class Controller {
         else {
             viewModel.start(corpus_path, destination, wantToStem);
             long finishTime 	= System.nanoTime();
-            showAlert("The dictionary build successfully. It took"+ (finishTime - startTime)/1000000.0 +" ms\")");
+            int N=viewModel.numOfDocs();
+            int Terms=viewModel.numOfTerms();
+            int cities=viewModel.numOfCities();
+            double time=(finishTime - startTime)/1000000.0/1000;
+            showAlert("The dictionary build successfully!\n It took"+ time +"sec.\n" +"Number of terms in dictionary: "+ Terms+"\n"+"Number of documents indexed: "+N+"\n Number of cities in cities index: "+ cities);
         }
 
     }
