@@ -49,8 +49,9 @@ public class Controller {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setContentText(alertMessage);
         alert.show();
-
     }
+
+
 
     public void Initialize(){
         language.setItems(list);
@@ -67,10 +68,10 @@ public class Controller {
                  showAlert("please enter corpus path and Posting & Dictionary Destanation");
         else {
             viewModel.start(corpus_path, destination, wantToStem);
-            showAlert("The dictionary build");
+            long finishTime 	= System.nanoTime();
+            showAlert("The dictionary build successfully. It took"+ (finishTime - startTime)/1000000.0 +" ms\")");
         }
-        long finishTime 	= System.nanoTime();
-        System.out.println("Time for test:  " + (finishTime - startTime)/1000000.0 + " ms");
+
     }
 
     public void showDic() {
