@@ -31,4 +31,17 @@ public class View_Model {
     public void loadDic(boolean wantToStem, String destination) {
         model.loadDic(wantToStem,destination);
     }
+
+    public int numOfDocs(){
+        return model.numOfDocs();
+    }
+
+    public int numOfTerms(){
+        return model.numOfTerms();
+    }
+
+
+    public int numOfCities() {
+        return model.numOfCities();
+    }
 }

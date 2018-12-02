@@ -29,7 +29,19 @@ public class Model {
         indexer.reset(destination);
     }
 
+    public int numOfDocs(){
+        return indexer.numOfDocs();
+    }
+
+    public int numOfTerms(){
+        return indexer.numOfTerms();
+    }
+
     public void loadDic(boolean wantToStem, String destination) {
         indexer.loadDic(wantToStem,destination);
+    }
+
+    public int numOfCities() {
+        return indexer.numOfCities();
     }
 }
