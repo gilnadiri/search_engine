@@ -21,7 +21,7 @@ public class Indexer {
         this.documents = new HashMap<>();
         dictionary=new HashMap<>();
         cities_index=new HashMap<>();
-        parser=new Parse();
+        parser=new Parse(corpusPath);
         this.wantToStemm = wantToStemm;
         PostingNum = 0;
         this.CorpusPath=corpusPath;
@@ -188,7 +188,7 @@ public class Indexer {
     /**
      * merge all the temporary files to final posting file
      */
-    private void merge_All_tmp_postings_files() throws IOException {
+    public void merge_All_tmp_postings_files() throws IOException {
         File f;
         if(wantToStemm)
             f = new File(Posting_And_dictionary_path_in_disk + "\\" + "final_posting stem");
@@ -265,9 +265,7 @@ public class Indexer {
 
     }
 
-
-
-    private void delete_all_temporary_posting_files() {
+    public void delete_all_temporary_posting_files() {
         if (wantToStemm)
             for (int i = 1; i <= PostingNum; i++) {
                 File file = new File(Posting_And_dictionary_path_in_disk + "\\" + i + "stem");
