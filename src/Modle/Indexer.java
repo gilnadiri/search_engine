@@ -46,22 +46,11 @@ public class Indexer {
             int coun=40;
             List<Map<Documentt,String>> fortyFiles=new ArrayList<>();
 
-            int j=0;
-            File[] Dirs=new File[DirsAndSW.length-1];
-            for (int i = 0; i < DirsAndSW.length; i++) {
-                if (!DirsAndSW[i].getName().equals("stop_words.txt")) {
-                    Dirs[j]=DirsAndSW[i];
-                    j++;
-                }
-            }
+
+            File[] Dirs=ignoreStopWords(DirsAndSW);
 
             boolean left=true;
             for (int i = 0; i < Dirs.length; i++) {
-                if(Dirs[i].getName().equals("stop_words.txt")) {
-                    coun--;
-                    continue;
-                }
-
 
                 File temp = Dirs[i];
                 File[] currDir = temp.listFiles();
@@ -104,6 +93,18 @@ public class Indexer {
         catch (IOException e)
         {e.printStackTrace();}
 
+    }
+
+    private File[] ignoreStopWords(File[] DirsAndSW) {
+        int j=0;
+        File[] Dirs=new File[DirsAndSW.length-1];
+        for (int i = 0; i < DirsAndSW.length; i++) {
+            if (!DirsAndSW[i].getName().equals("stop_words.txt")) {
+                Dirs[j]=DirsAndSW[i];
+                j++;
+            }
+        }
+        return Dirs;
     }
 
     /**

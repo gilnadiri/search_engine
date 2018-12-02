@@ -36,7 +36,7 @@ public class Main {
     private static void test6() throws IOException {
 
         Indexer indexer=new Indexer(false,"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה 1\\corpus","C:\\Users\\gil nadiri\\Desktop\\dest");
-        indexer.setNUM(46);
+        //indexer.setNUM(46);
         indexer.iniateIndex();
         Map<String,Documentt> map=indexer.documents;
         File f = new File("C:\\Users\\gil nadiri\\Desktop\\קבצים עדכניים" + "\\" + "hara");
