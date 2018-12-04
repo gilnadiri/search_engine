@@ -83,12 +83,11 @@ public class City implements Serializable {
     public boolean docExistANdAdd(String docNo,String loc){
 
         if(location.containsKey(docNo)){
-            location.put(location.get(docNo),location.get(docNo)+","+loc);
+            location.put(docNo,location.get(docNo)+","+loc);
             return true;
         }
         else
-            location.put(docNo,loc);
-
+            location.put(docNo, loc);
         return false;
     }
 

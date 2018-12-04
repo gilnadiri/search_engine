@@ -14,10 +14,12 @@ public class Indexer {
     public Map<String,Documentt> documents; //information on every doc
     public Map<String,Term> dictionary;     //inverted index of terms
     private Parse parser;
-    private HashMap<String,City> cities_index;    //inverted index of cities
+    public HashMap<String,City> cities_index;    //inverted index of cities
+    private HashSet <String> languages;
 
 
-    public Indexer(boolean wantToStemm,String corpusPath,String Posting_And_dictionary_path_in_disk)  {
+
+    public Indexer(boolean wantToStemm, String corpusPath, String Posting_And_dictionary_path_in_disk)  {
         this.documents = new HashMap<>();
         dictionary=new HashMap<>();
         cities_index=new HashMap<>();
@@ -26,6 +28,7 @@ public class Indexer {
         PostingNum = 0;
         this.CorpusPath=corpusPath;
         this.Posting_And_dictionary_path_in_disk=Posting_And_dictionary_path_in_disk;
+        this.languages=new HashSet<>();
 
     }
 
@@ -37,7 +40,7 @@ public class Indexer {
 
             ReadFile corpus = new ReadFile(CorpusPath);
             //initiate the city index by tags
-            cities_index=corpus.readAllCities(CorpusPath);
+            cities_index=corpus.readAllCities(CorpusPath,languages);
             parser.setCities(cities_index);
 
             File Main = new File(CorpusPath);
@@ -95,16 +98,10 @@ public class Indexer {
 
     }
 
-    private File[] ignoreStopWords(File[] DirsAndSW) {
-        int j=0;
-        File[] Dirs=new File[DirsAndSW.length-1];
-        for (int i = 0; i < DirsAndSW.length; i++) {
-            if (!DirsAndSW[i].getName().equals("stop_words.txt")) {
-                Dirs[j]=DirsAndSW[i];
-                j++;
-            }
-        }
-        return Dirs;
+
+
+    public HashSet<String> getLanguages() {
+        return languages;
     }
 
     /**
@@ -277,15 +274,20 @@ public class Indexer {
 
         final_posting.flush();
         final_posting.close();
-
+        for(int i=1;i<buffers_readers.length;i++)
+            buffers_readers[i].close();
 
     }
 
     public void delete_all_temporary_posting_files() {
+
+
         if (wantToStemm)
             for (int i = 1; i <= PostingNum; i++) {
                 File file = new File(Posting_And_dictionary_path_in_disk + "\\" + i + "stem");
                 file.delete();
+
+
             }
         else
             for (int i = 1; i <= PostingNum; i++) {
@@ -294,63 +296,7 @@ public class Indexer {
             }
     }
 
-    private void save_Docs_map_in_disk() {
-        FileOutputStream fos = null;
-        try {
-            if(wantToStemm)
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"docs stem" );
-            else
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"docs" );
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(documents);
-            oos.close();
-            fos.close();
 
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-    }
-
-    private void save_cities_index_in_disk() {
-        FileOutputStream fos = null;
-        try {
-            if(wantToStemm)
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities stem" );
-            else
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities" );
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(cities_index);
-            oos.close();
-            fos.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void save_Dictionary_in_disk() {
-        FileOutputStream fos = null;
-        try {
-            if(wantToStemm)
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"dictionary stem" );
-            else
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"dictionary" );
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(dictionary);
-            oos.close();
-            fos.close();
-
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     private int[] find_max_tf_AND_DocLength(Map<String, Integer> terms_for_index) {
         int [] details=new int[2];
         int max=0;
@@ -386,7 +332,17 @@ public class Indexer {
             }
         return frequncy;
     }
-
+    private File[] ignoreStopWords(File[] DirsAndSW) {
+        int j=0;
+        File[] Dirs=new File[DirsAndSW.length-1];
+        for (int i = 0; i < DirsAndSW.length; i++) {
+            if (!DirsAndSW[i].getName().equals("stop_words.txt")) {
+                Dirs[j]=DirsAndSW[i];
+                j++;
+            }
+        }
+        return Dirs;
+    }
     private String merge_lines(String curLine, String check) {
         String s1 = curLine.substring(0, curLine.indexOf(':'));
         String s2 = check.substring(0, check.indexOf(':'));
@@ -552,6 +508,66 @@ public class Indexer {
     }
     //</editor-fold>
 
+    //<editor-fold desc="save in disk">
+    private void save_Docs_map_in_disk() {
+        FileOutputStream fos = null;
+        try {
+            if(wantToStemm)
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"docs stem" );
+            else
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"docs" );
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(documents);
+            oos.close();
+            fos.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void save_cities_index_in_disk() {
+        FileOutputStream fos = null;
+        try {
+            if(wantToStemm)
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities stem" );
+            else
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities" );
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(cities_index);
+            oos.close();
+            fos.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void save_Dictionary_in_disk() {
+        FileOutputStream fos = null;
+        try {
+            if(wantToStemm)
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"dictionary stem" );
+            else
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"dictionary" );
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(dictionary);
+            oos.close();
+            fos.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+    //</editor-fold>
+
 }
 
 
@@ -590,198 +606,3 @@ public class Indexer {
 
 
 
-
-/*
-    public void merge_two_files(int i1, int i2)  {
-
-        try {
-            File f = new File("resources" + "\\" + "new");
-            BufferedWriter mergedFile = new BufferedWriter(new FileWriter(f));
-
-
-            File fille1 = new File("resources" + "\\" + i1);
-            BufferedReader file1 = new BufferedReader(new FileReader(fille1));
-
-
-            File fille2 = new File("resources" + "\\" + i2);
-            BufferedReader file2 = new BufferedReader(new FileReader(fille2));
-
-            String [] lines_Of_file1=new String[1500];
-            String [] lines_Of_file2=new String[1500];
-
-
-            for(int i=0;i<1500;i++)
-            {
-                lines_Of_file1[i]=file1.readLine();
-                lines_Of_file2[i]=file2.readLine();
-            }
-
-
-            String str1 = lines_Of_file1[0];
-            String str2 = lines_Of_file2[0];
-
-
-            while (str1 != null && str2 != null) {
-                String s1 = str1.substring(0, str1.indexOf(":"));
-                String s2 = str2.substring(0, str2.indexOf(":"));
-
-                if (str1.substring(0, str1.indexOf(":")).compareTo(str2.substring(0, str2.indexOf(":"))) < 0) {
-                    mergedFile.write(str1 + "\n");
-                    str1 = file1.readLine();
-                } else if (str1.substring(0, str1.indexOf(":")).compareTo(str2.substring(0, str2.indexOf(":"))) > 0) {
-                    mergedFile.write(str2 + "\n");
-                    str2 = file2.readLine();
-                } else {   //if its the same terms-merge into 1 posting and write to the merged file
-                    String merged = mergeToPostingOfSameTerms(str1, str2);
-                    mergedFile.write(merged + "\n");
-                    str1 = file1.readLine();
-                    str2 = file2.readLine();
-                }
-            }
-            if (str1 != null) {
-                while (str1 != null) {
-                    mergedFile.write(str1 + "\n");
-                    str1 = file1.readLine();
-                }
-            } else if (str2 != null) {
-                while (str2 != null) {
-                    mergedFile.write(str2 + "\n");
-                    str2 = file2.readLine();
-                }
-            }
-
-            mergedFile.flush();
-            mergedFile.close();
-            file1.close();
-            file2.close();
-
-            fille1.delete();
-            fille2.delete();
-
-            File old = new File("resources" + "\\" + "new");
-            File neww = new File("resources" + "\\" + i2);
-            old.renameTo(neww);
-        }
-        catch (IOException ex){
-
-        }
-
-
-
-
-    }
-*/
-
-/*
-    public void BuildTempPostings(Map<Documentt,String> documents_To_parse) {
-      //  Character.isUpperCase(s.charAt(0))
-        try {
-            PostingNum++;
-            Map<String, String> temporary_posting_Upper = new HashMap<>();
-            Map<String, String> temporary_posting_lower = new HashMap<>();
-
-
-            for (Map.Entry<Documentt, String> entry : documents_To_parse.entrySet()) {
-                Map<String, Integer> terms_after_parser = parser.getParsing(entry.getValue());
-                //update info on document, and add it to the docs dictionary
-                Documentt tmp = entry.getKey();
-                tmp.setDoc_uniqe_words(terms_after_parser.size());
-                tmp.setDoc_max_tf(find_max_tf(terms_after_parser));
-                documents.add(tmp);
-                //
-                for (Map.Entry<String, Integer> entry_of_parsedTerms : terms_after_parser.entrySet()) {
-                    String term = entry_of_parsedTerms.getKey();
-                    String postOfterm = "";
-                    Boolean is_uper_case= Character.isUpperCase(term.charAt(0));
-                    if(is_uper_case) {
-                        if (!(temporary_posting_Upper.containsKey(term)))
-                            postOfterm = term + ":" + tmp.Doc_Name + "+" + entry_of_parsedTerms.getValue() + ",";
-                        else
-                            postOfterm = temporary_posting_Upper.get(term) + tmp.Doc_Name + "+" + entry_of_parsedTerms.getValue() + ",";  //if the term exist-just add the new info on the new doc and tf
-
-                        temporary_posting_Upper.put(term, postOfterm);
-                    }
-                    else{  //if its lower_case
-                        if (!(temporary_posting_lower.containsKey(term)))
-                        postOfterm = term + ":" + tmp.Doc_Name + "+" + entry_of_parsedTerms.getValue() + ",";
-                    else
-                        postOfterm = temporary_posting_lower.get(term) + tmp.Doc_Name + "+" + entry_of_parsedTerms.getValue() + ",";  //if the term exist-just add the new info on the new doc and tf
-
-                        temporary_posting_lower.put(term, postOfterm);
-                    }
-
-                }
-            }
-
-            //sort the posting_upper_case by alphbet
-            List<String> list_upper_case = new ArrayList<>(temporary_posting_Upper.values());
-            list_upper_case.sort(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    String s1 = o1.substring(0, o1.indexOf(':'));
-                    String s2 = o2.substring(0, o2.indexOf(':'));
-                    return s1.compareTo(s2);
-                }
-            });
-            //sort the posting_lower_case by alphbet
-            List<String> list_lower_case = new ArrayList<>(temporary_posting_lower.values());
-            list_lower_case.sort(new Comparator<String>() {
-                @Override
-                public int compare(String o1, String o2) {
-                    String s1 = o1.substring(0, o1.indexOf(':'));
-                    String s2 = o2.substring(0, o2.indexOf(':'));
-                    return s1.compareTo(s2);
-                }
-            });
-
-            //writing the 2 temporary postings to 2 temporary postings file-one upper case, second lower case
-
-            //upper posting
-            FileWriter fileWriter_upper = new FileWriter("resources" + "\\" + PostingNum+"uper");
-            PrintWriter temporaryFile_upper = new PrintWriter(fileWriter_upper);
-            for (int i = 0; i < list_upper_case.size(); i++)
-                temporaryFile_upper.println(list_upper_case.get(i));
-            temporaryFile_upper.flush();
-            temporaryFile_upper.close();
-
-            //lower posting
-            FileWriter fileWriter_lower = new FileWriter("resources" + "\\" + PostingNum+"lower");
-            PrintWriter temporaryFile_lower = new PrintWriter(fileWriter_lower);
-            for (int i = 0; i < list_lower_case.size(); i++)
-                temporaryFile_lower.println(list_lower_case.get(i));
-            temporaryFile_lower.flush();
-            temporaryFile_lower.close();
-
-
-        }
-        catch (IOException ex){
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-
-    }
-*/
-
-/*
-    private String getNextLine(Queue<String> queue) {
-        String curLine= queue.poll();
-        String[] s= curLine.split("#");
-        curLine=s[0];
-        int i=Integer.getInteger(s[1]);
-
-        boolean continu=true;
-        while(continu) {
-            String check = queue.poll();
-            if(is_The_Same_Term(curLine,check))
-                curLine=merge_lines(curLine,check);
-            else
-            {
-                continu=false;
-                queue.add(check);
-            }
-        }
-        return curLine;
-    }
-*/

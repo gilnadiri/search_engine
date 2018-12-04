@@ -3,6 +3,7 @@ package Modle;
 import ViewModel.View_Model;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -43,5 +44,9 @@ public class Model {
 
     public int numOfCities() {
         return indexer.numOfCities();
+    }
+
+    public HashSet<String> languages() {
+        return indexer.getLanguages();
     }
 }

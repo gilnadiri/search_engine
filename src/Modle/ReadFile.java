@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -19,7 +20,7 @@ public class ReadFile {
 
     }
 
-    public HashMap<String,City> readAllCities(String path) throws IOException {
+    public HashMap<String,City> readAllCities(String path, HashSet<String> langueges) throws IOException {
         File Main = new File(path);
         File[] Dirs = Main.listFiles();
         HashMap<String,City> allcities=new HashMap<>();
@@ -41,21 +42,38 @@ public class ReadFile {
                 if (text.length < 2)
                     continue;
                 String[] s3 = text[0].split("<F P=104>");
-                if (s3.length == 1 || s3[1].length() >= 4 && s3[1].substring(0, 4).equals("</F>"))
-                    ;
-                else {
+                if (!(s3.length == 1 || s3[1].length() >= 4 && s3[1].substring(0, 4).equals("</F>"))){
                     String[] s4 = s3[1].split(" ");
-                    for (int j = 0; j < s4.length; j++)
-                        if (!(s4[j].equals(""))&&!(s4[j].toUpperCase().equals("THE"))) {
-                            if(allcities.containsKey(s4[j].toUpperCase()))
+                    for (int j = 0; j < s4.length; j++) {
+                        if (!(s4[j].equals("")) && !(s4[j].toUpperCase().equals("THE"))&& !(s4[j].toUpperCase().equals("FOR"))) {
+                            if (allcities.containsKey(s4[j].toUpperCase()))
                                 break;
-                            allcities.put(s4[j].toUpperCase(), new City(s4[j].toUpperCase(),"","",""));
+                            allcities.put(s4[j].toUpperCase(), new City(s4[j].toUpperCase(), "", "", ""));
                             break;
                         }
+                    }
                 }
+                String lang=add_langues(text[1]);
+                if(!(lang.equals("")))
+                    langueges.add(lang);
+
             }
         }
         return allcities;
+    }
+
+    private String add_langues(String s) {
+      String []s1=s.split("<F P=105>");
+      if(s1.length!=1) {
+          String[] s2 = s1[1].split("</F>");
+          String ans="";
+          String s3=s2[0];
+          for(int i=0;i<s3.length();i++)
+              if(s3.charAt(i)!=' ')
+                  ans=ans+s3.charAt(i);
+          return ans;
+      }
+      else return "";
     }
 
     public Map<Documentt, String> readSingleFile(File singleFile) throws IOException

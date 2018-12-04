@@ -5,6 +5,7 @@ import Modle.Term;
 
 import javax.swing.text.View;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class View_Model {
@@ -43,5 +44,9 @@ public class View_Model {
 
     public int numOfCities() {
         return model.numOfCities();
+    }
+
+    public HashSet<String> getLanguages() {
+        return model.languages();
     }
 }

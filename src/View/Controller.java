@@ -23,8 +23,8 @@ import javax.xml.bind.Element;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.io.File;
+import java.util.*;
 import java.util.List;
-import java.util.Observable;
 
 public class Controller {
     public View_Model viewModel;
@@ -34,7 +34,7 @@ public class Controller {
     public javafx.scene.control.TextArea posting_destanation_path;
     public javafx.scene.control.CheckBox stemming;
     public javafx.scene.control.ChoiceBox language;
-    public ObservableList<String> list= FXCollections.observableArrayList("English","Spanish","Hebrew","France");
+    public ObservableList<String> list= FXCollections.observableArrayList();
     public javafx.scene.control.Button start;
     public javafx.scene.control.Button reset;
     public javafx.scene.control.Button showDic;
@@ -51,12 +51,6 @@ public class Controller {
         alert.show();
     }
 
-
-
-    public void Initialize(){
-        language.setItems(list);
-    }
-
     public void setViewModel(View_Model v){this.viewModel=v;}
 
     public void start(){
@@ -67,15 +61,35 @@ public class Controller {
         if(corpus_path.equals("")|| destination.equals(""))
                  showAlert("please enter corpus path and Posting & Dictionary Destination");
         else {
+            showAlert("Just a few minutes, We are working on it....");///TODO hodaya to close the window
             viewModel.start(corpus_path, destination, wantToStem);
+            HashSet<String> leng= viewModel.getLanguages();
+            Iterator<String> itr = leng.iterator();
+            while(itr.hasNext()){
+                String toAdd=itr.next();
+                if(!hasDigit(toAdd))
+                    list.add(toAdd);
+            }
+            list.sort(String::compareToIgnoreCase);
+            language.setItems(list);
             long finishTime 	= System.nanoTime();
             int N=viewModel.numOfDocs();
             int Terms=viewModel.numOfTerms();
             int cities=viewModel.numOfCities();
             double time=(finishTime - startTime)/1000000.0/1000;
-            showAlert("The dictionary build successfully!\n It took"+ time +"sec.\n" +"Number of terms in dictionary: "+ Terms+"\n"+"Number of documents indexed: "+N+"\n Number of cities in cities index: "+ cities);
+            showAlert("The dictionary build successfully!\n It took: "+ time +"sec.\n" +"Number of terms in dictionary: "+ Terms+"\n"+"Number of documents indexed: "+N+"\nNumber of cities in cities index: "+ cities);
+
+
         }
 
+    }
+
+    private boolean hasDigit(String toAdd) {
+        for(int i=0;i<toAdd.length();i++){
+            if(Character.isDigit(toAdd.charAt(i)))
+                return true;
+        }
+        return false;
     }
 
     public void showDic() {
@@ -127,12 +141,14 @@ public class Controller {
     public void reset(){
         String destination=this.posting_destanation_path.getText();
         viewModel.reset(destination);
+        showAlert("Reset done successfully!");
     }
 
     public void loadDic(){
         boolean wantToStem=this.stemming.isSelected();
         String destination=this.posting_destanation_path.getText();
         viewModel.loadDic(wantToStem,destination);
+        showAlert("Dictionary loaded successfully");
     }
 
 

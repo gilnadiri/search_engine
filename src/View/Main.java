@@ -24,9 +24,7 @@ public class Main extends Application {
         Controller controller = fxmlLoader.getController();
         controller.setViewModel(viewModel);
         controller.setStage(primaryStage);
-        controller.Initialize();
         //--------------
-        //SetStageCloseEvent(primaryStage,model);
         primaryStage.show();
     }
 
