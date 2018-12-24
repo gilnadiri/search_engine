@@ -46,7 +46,7 @@ public class Indexer {
             File Main = new File(CorpusPath);
             File[] DirsAndSW = Main.listFiles();
             //build all the tmp posting files-1 temporary posting file per 40 files
-            int coun=40;
+            int coun=10;
             List<Map<Documentt,String>> fortyFiles=new ArrayList<>();
 
 
@@ -66,7 +66,7 @@ public class Indexer {
                 fortyFiles.add(corpus.readSingleFile(currFile));
                 ;
                 if(coun==0){
-                    coun=40;
+                    coun=10;
                     BuildTempPostings(fortyFiles);
                     fortyFiles.clear();
                 }
@@ -83,26 +83,14 @@ public class Indexer {
             save_Dictionary_in_disk();
             save_cities_index_in_disk();
             save_Docs_map_in_disk();
-
-            //TODO save to the disk all of the rest of information(N)
-
-
-
-
-
-
-
         }
         catch (IOException e)
         {e.printStackTrace();}
-
     }
 
 
 
-    public HashSet<String> getLanguages() {
-        return languages;
-    }
+
 
     /**
      * this func take the text of document, parsed it and build tmp posting file for 40 files from the corpus
@@ -376,7 +364,14 @@ public class Indexer {
 
     public  void setNUM(int n){this.PostingNum=n;}
 
+    public HashSet<String> getLanguages() {
+        return languages;
+    }
+
     public ArrayList<Term> showDic() {
+       if(dictionary.size()==0)
+           return null;
+
         ArrayList<Term> list = new ArrayList<>(dictionary.values());
         list.sort(new Comparator<Term>() {
             @Override
@@ -390,7 +385,7 @@ public class Indexer {
         return list;
     }
 
-    public void reset(String destination) {  //TODO check if need to get destination for this func, and if need to delete the docs_map,N,cities_index, and how to clean the RAM
+    public void reset(String destination) {
         //clean the disk
         delete_posting_file(destination);
         delete_dictionary(destination);
@@ -443,11 +438,19 @@ public class Indexer {
     //</editor-fold>
 
     //<editor-fold desc="load from disk">
-    public void loadDic(boolean wantToStem, String destination) { //TODO check if need to get datination or not in this func, and if need to load the cities index,and N
+    public boolean loadDic(boolean wantToStem, String destination) {
+        File f;
+       if(wantToStem)
+         f = new File(destination + "\\" + "dictionary stem");
+       else
+          f=new File(destination + "\\" + "dictionary") ;
+       if(!f.exists()) {
+            return false;
+        }
 
         load_dictionary(wantToStem,destination);
         load_Documents (wantToStem,destination);
-
+        return true;
 
     }
 
@@ -460,7 +463,7 @@ public class Indexer {
                 fis = new FileInputStream(destination + "\\" + "docs");
 
             ObjectInputStream ois = new ObjectInputStream(fis);
-            dictionary=(HashMap) ois.readObject();
+            documents=(HashMap) ois.readObject();
             ois.close();
             fis.close();
         }

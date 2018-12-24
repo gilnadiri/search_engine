@@ -312,7 +312,7 @@ public class Parse {
 
 
             }
-            //TODO check if precent bigger then 100
+
             else if (token0.length() - 1 > 0 && token0.charAt(token0.length() - 1) == '%') {
                 if (token0.length() >= 2 && IsNumber(token0.substring(0, token0.length() - 2))) {
                     add_To_tokens_map(token0.replace("%", "") + "%");

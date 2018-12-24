@@ -19,6 +19,8 @@ public class Model {
     }
 
     public ArrayList<Term> showDic() {
+        if(indexer==null)
+            return null;
         return indexer.showDic();
     }
 
@@ -38,8 +40,10 @@ public class Model {
         return indexer.numOfTerms();
     }
 
-    public void loadDic(boolean wantToStem, String destination) {
-        indexer.loadDic(wantToStem,destination);
+    public boolean loadDic(boolean wantToStem, String destination) {
+        if(indexer==null)
+            indexer=new Indexer(wantToStem,"",destination);
+        return indexer.loadDic(wantToStem,destination);
     }
 
     public int numOfCities() {

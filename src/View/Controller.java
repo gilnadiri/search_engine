@@ -61,8 +61,11 @@ public class Controller {
         if(corpus_path.equals("")|| destination.equals(""))
                  showAlert("please enter corpus path and Posting & Dictionary Destination");
         else {
-            showAlert("Just a few minutes, We are working on it....");///TODO hodaya to close the window
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("Just a few minutes, We are working on it....");
+            alert.show();
             viewModel.start(corpus_path, destination, wantToStem);
+            alert.close();
             HashSet<String> leng= viewModel.getLanguages();
             Iterator<String> itr = leng.iterator();
             while(itr.hasNext()){
@@ -95,23 +98,27 @@ public class Controller {
     public void showDic() {
         Stage stage=new Stage();
         List<Term> list = viewModel.showDic();
-        listView = new ListView();
-        for (Term t : list) {
-            listView.getItems().add(t.getTerm()+"-----> The DF:    "+t.getDf());
+        if(list==null)
+            showAlert("You must first start the program or load exist dictionary!");
+        else {
+            listView = new ListView();
+            for (Term t : list) {
+                listView.getItems().add(t.getTerm() + "-----> The TF:    " + t.getTotal_frequncy_in_the_corpus());
+            }
+            Scene scene = new Scene(new Group());
+            stage.initModality(Modality.APPLICATION_MODAL); //Lock the window until it closes
+            final VBox vBox = new VBox();
+            vBox.setSpacing(5);
+            vBox.setPadding(new Insets(10, 0, 0, 10));
+
+            vBox.getChildren().addAll(listView);
+            vBox.setAlignment(Pos.CENTER);
+
+            Group group = ((Group) scene.getRoot());
+            group.getChildren().addAll(vBox);
+            stage.setScene(scene);
+            stage.show();
         }
-        Scene scene=new Scene(new Group());
-        stage.initModality(Modality.APPLICATION_MODAL); //Lock the window until it closes
-        final VBox vBox=new VBox();
-        vBox.setSpacing(5);
-        vBox.setPadding(new Insets(10,0,0,10));
-
-        vBox.getChildren().addAll(listView);
-        vBox.setAlignment(Pos.CENTER);
-
-        Group group=((Group) scene.getRoot());
-        group.getChildren().addAll(vBox);
-        stage.setScene(scene);
-        stage.show();
     }
 
 
@@ -147,8 +154,22 @@ public class Controller {
     public void loadDic(){
         boolean wantToStem=this.stemming.isSelected();
         String destination=this.posting_destanation_path.getText();
-        viewModel.loadDic(wantToStem,destination);
-        showAlert("Dictionary loaded successfully");
+        if(destination.equals(""))
+            showAlert("Pleas enter the path where you saved your dictionary at last launch");
+        else {
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("Just a few minutes, We are working on it....");
+            alert.show();
+            boolean ans=viewModel.loadDic(wantToStem, destination);
+            if(!ans) {
+                alert.close();
+                showAlert("No dictionary to load");
+            }
+            else {
+                alert.close();
+                showAlert("Dictionary loaded successfully");
+            }
+        }
     }
 
 

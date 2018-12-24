@@ -17,7 +17,6 @@ public class ReadFile {
 
     public ReadFile(String CorpusPath) {
         this.CorpusPath=CorpusPath;
-
     }
 
     public HashMap<String,City> readAllCities(String path, HashSet<String> langueges) throws IOException {

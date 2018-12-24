@@ -20,7 +20,7 @@ public class View_Model {
     public void start(String corpus_path, String destination,boolean wantToStem) {
         model.start(corpus_path,destination,wantToStem);
     }
-
+/////////
     public ArrayList<Term> showDic() {
         return model.showDic();
     }
@@ -29,8 +29,8 @@ public class View_Model {
         model.reset(destination);
     }
 
-    public void loadDic(boolean wantToStem, String destination) {
-        model.loadDic(wantToStem,destination);
+    public boolean loadDic(boolean wantToStem, String destination) {
+        return model.loadDic(wantToStem,destination);
     }
 
     public int numOfDocs(){

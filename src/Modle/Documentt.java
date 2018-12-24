@@ -5,7 +5,7 @@ public class Documentt implements Serializable {
 
     public String Doc_Name;
     public int Doc_max_tf;    //the freqency of the most common term in the doc
-    private int DocLength;   //num of words  //TODo לבדוק אם זה לפני אחרי הפרסר, והאם כולל חזרות
+    private int DocLength;   //num of words
     public int Doc_uniqe_words;
     private String Doc_City;
 
