@@ -4,9 +4,11 @@ public class Searcher {
 
     private Ranker ranker;
 
-    public Searcher (){
-        this.ranker=new Ranker();
+    public Searcher (String postingindisk){
+        this.ranker=new Ranker(postingindisk);
     }
+
+
 
 
 }

@@ -68,6 +68,8 @@ public class Ranker {
                 String [] docsWithWord=spliteDocNo(postiongForWord);
                 for(int j=0;j<docsWithWord.length;j++){
                     String docNo=docsWithWord[j].substring(0,docsWithWord[j].indexOf("+"));
+                    //atStart
+                    int atStart=Integer.valueOf()
                     //bm25
                     double bm25=BM25(query.get(i),docsWithWord[j],documents.get(docNo).getDocLength());
                     if(BM25.containsKey(docNo))
@@ -93,8 +95,7 @@ public class Ranker {
                         Wiq_2.put(docNo,Wiq_2.get(docNo)+wiq);
                     else
                         Wiq_2.put(docNo,wiq);
-                    //at start
-                    double atStart=AtStart()
+
 
                 }
             } catch (IOException e) {
