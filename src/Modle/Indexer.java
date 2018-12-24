@@ -111,17 +111,18 @@ public class Indexer {
                     tmp.setDoc_uniqe_words(terms_after_parser.size());
                     tmp.setDoc_max_tf(details[0]);
                     tmp.setDocLength(details[1]);
+                    tmp.setYeshooyot(top_five_yeshooyot(terms_after_parser));
                     documents.put(tmp.getDoc_Name(),tmp);
                     //
 
-                    for (Map.Entry<String, Integer> entry_of_parsedTerms : terms_after_parser.entrySet()) {
+                    for (Map.Entry<String, TokenInfo> entry_of_parsedTerms : terms_after_parser.entrySet()) {
                         String term = entry_of_parsedTerms.getKey();
                         String postOfterm = "";
 
 
                         String term_lower = term.toLowerCase();
                         if (temporary_posting.containsKey(term_lower)) {
-                            postOfterm = temporary_posting.get(term_lower)+tmp.Doc_Name+"+"+entry_of_parsedTerms.getValue()+",";  //if the term exist-just add the new info on the new doc and tf
+                            postOfterm = temporary_posting.get(term_lower)+tmp.Doc_Name+"+"+entry_of_parsedTerms.getValue().frequentInDoc+"~"+entry_of_parsedTerms.getValue().atStart+",";  //if the term exist-just add the new info on the new doc and tf and st start
                             temporary_posting.put(term_lower, postOfterm);
                             continue;
                         } else {
@@ -130,12 +131,12 @@ public class Indexer {
                             if (temporary_posting.containsKey(term_upper) && term.charAt(0) >= 'a' && term.charAt(0) <= 'z')  //change in the dictionary yo llower case and teshasher
                             {
                                 String[] s = temporary_posting.get(term_upper).split(":");
-                                postOfterm = term_lower + ":"+s[1]+tmp.Doc_Name+"+"+entry_of_parsedTerms.getValue()+",";
+                                postOfterm = term_lower + ":"+s[1]+tmp.Doc_Name+"+"+entry_of_parsedTerms.getValue().frequentInDoc+"~"+entry_of_parsedTerms.getValue().atStart+",";
                                 temporary_posting.remove(term_upper);
                                 temporary_posting.put(term_lower, postOfterm);
                                 continue;
                             } else if (temporary_posting.containsKey(term_upper) && term.charAt(0) >= 'A' && term.charAt(0) <= 'Z') {
-                                postOfterm = temporary_posting.get(term_upper)+tmp.Doc_Name+"+"+entry_of_parsedTerms.getValue()+",";
+                                postOfterm = temporary_posting.get(term_upper)+tmp.Doc_Name+"+"+entry_of_parsedTerms.getValue().frequentInDoc+"~"+entry_of_parsedTerms.getValue().atStart+",";
                                 temporary_posting.put(term_upper, postOfterm);
                                 continue;
 
@@ -144,7 +145,7 @@ public class Indexer {
 
                         }
                         if (!(temporary_posting.containsKey(term))) {
-                            postOfterm = term + ":" + tmp.Doc_Name + "+" + entry_of_parsedTerms.getValue() + ",";
+                            postOfterm = term + ":" + tmp.Doc_Name + "+" + entry_of_parsedTerms.getValue().frequentInDoc+"~"+entry_of_parsedTerms.getValue().atStart+",";
                             temporary_posting.put(term, postOfterm);
                             continue;
                         }
@@ -185,6 +186,29 @@ public class Indexer {
 
 
     }
+
+    private ArrayList<String> top_five_yeshooyot(Map<String, TokenInfo> terms_after_parser) {
+        HashMap<String,Integer> yeshooyot=new HashMap<>();
+        for(Map.Entry<String,TokenInfo>  entry: terms_after_parser.entrySet())
+            if(Character.isUpperCase(entry.getKey().charAt(0)))
+                yeshooyot.put(entry.getKey(),entry.getValue().frequentInDoc);
+
+        List<Map.Entry<String, Integer>> list = new LinkedList<>(yeshooyot.entrySet());
+        list.sort(new Comparator<Map.Entry<String, Integer>>() {
+            @Override
+            public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
+               return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+        ArrayList<String> top_5=new ArrayList<>();
+        for(int i=0;i<5;i++)
+            top_5.add(list.get(i).getKey());
+        return top_5;
+    }
+
+
+
+
 
     /**
      * merge all the temporary files to final posting file
@@ -285,14 +309,14 @@ public class Indexer {
     }
 
 
-    private int[] find_max_tf_AND_DocLength(Map<String, Integer> terms_for_index) {
+    private int[] find_max_tf_AND_DocLength(Map<String, TokenInfo> terms_for_index) {
         int [] details=new int[2];
         int max=0;
         int doc_length=0;
-        for (Map.Entry<String,Integer> entry : terms_for_index.entrySet()) {
-            doc_length=doc_length+entry.getValue();
-            if(entry.getValue()>max)
-                max=entry.getValue();
+        for (Map.Entry<String,TokenInfo> entry : terms_for_index.entrySet()) {
+            doc_length=doc_length+entry.getValue().frequentInDoc;
+            if(entry.getValue().frequentInDoc>max)
+                max=entry.getValue().frequentInDoc;
         }
         details[0]=max;
         details[1]=doc_length;
@@ -310,7 +334,7 @@ public class Indexer {
         return pointer_to_final_posting=pointer_to_final_posting+curLine.getBytes().length+1;
     }
 
-    private int compute_total_freq_in_corpus(String curLine) {
+    private int compute_total_freq_in_corpus(String curLine) { //TODO מה קורה אם אחרי הפלוס יש מספר באורך 2 תווים
         int frequncy=0;
         for(int i=0;i<curLine.length();i++)
             if(curLine.charAt(i)=='+') {

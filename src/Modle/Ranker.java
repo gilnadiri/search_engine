@@ -56,19 +56,19 @@ public class Ranker {
         for(int i=0;i<query.size();i++) {
             RandomAccessFile raf = null;
             try {
-            raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk, "rw");
-            long pointer=dictionary.get(query.get(i)).getPointerToPostings();
-            raf.seek(pointer);
-            String postiongForWord=raf.readLine();
-            String [] docsWithWord=spliteDocNo(postiongForWord);
-            for(int j=0;j<docsWithWord.length;j++){
-                String docNo=docsWithWord[j].substring(0,docsWithWord[j].indexOf("+"));
-                double bm25=BM25(query.get(i),docsWithWord[j]);
-                if(BM25.containsKey(docsWithWord[j]))
-                    BM25.put(docsWithWord[j],BM25.get(docsWithWord[j])+bm25);
-                else
-                    BM25.put(docsWithWord[j],bm25);
-            }
+                raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk, "rw");
+                long pointer=dictionary.get(query.get(i)).getPointerToPostings();
+                raf.seek(pointer);
+                String postiongForWord=raf.readLine();
+                String [] docsWithWord=spliteDocNo(postiongForWord);
+                for(int j=0;j<docsWithWord.length;j++){
+                    String docNo=docsWithWord[j].substring(0,docsWithWord[j].indexOf("+"));
+                    double bm25=BM25(query.get(i),docsWithWord[j]);
+                    if(BM25.containsKey(docsWithWord[j]))
+                        BM25.put(docsWithWord[j],BM25.get(docsWithWord[j])+bm25);
+                    else
+                        BM25.put(docsWithWord[j],bm25);
+                }
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -89,7 +89,7 @@ public class Ranker {
         int CWQ=calculateWordFreqQuery(word);
         int CWD=calculateWordFreqDoc(word);
 
-        }
+    }
 
     private int calculateWordFreqDoc(String word) {
 

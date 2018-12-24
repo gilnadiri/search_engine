@@ -1,5 +1,6 @@
 package Modle;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 public class Documentt implements Serializable {
 
@@ -8,6 +9,7 @@ public class Documentt implements Serializable {
     private int DocLength;   //num of words
     public int Doc_uniqe_words;
     private String Doc_City;
+    private ArrayList<String> Yeshooyot;  //the top 5 yeshoohoyot in the doc-from the most stronget to less stronger
 
 
 
@@ -21,11 +23,20 @@ public class Documentt implements Serializable {
         Doc_uniqe_words = doc_uniqe_words;
         Doc_City = doc_City;
         DocLength = docLength;
+        Yeshooyot=new ArrayList<>();
 
     }
 
     public int getDocLength() {
         return DocLength;
+    }
+
+    public ArrayList<String> getYeshooyot() {
+        return Yeshooyot;
+    }
+
+    public void setYeshooyot(ArrayList<String> yeshooyot) {
+        Yeshooyot = yeshooyot;
     }
 
     public void setDocLength(int docLength) {

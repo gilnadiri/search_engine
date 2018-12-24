@@ -620,10 +620,10 @@ public class Parse {
         }
     }
 
-    private boolean atStart(int i) {
+    private String atStart(int i) {
         if(i<SplitDoc.length/5)
-            return true;
-        return false;
+            return "1";
+        return "0";
     }
 
 
