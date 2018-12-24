@@ -1,10 +1,10 @@
 package Modle;
 
+import javax.swing.text.html.ListView;
 import java.awt.*;
+import java.awt.List;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Ranker {
     public Map<String,Documentt> documents; //information on every doc
@@ -20,7 +20,6 @@ public class Ranker {
         this.documents = new HashMap<>();
         this.dictionary=new HashMap<>();
         this.Posting_And_dictionary_path_in_disk=Posting_And_dictionary_path_in_disk;
-        this.avdl=avdl();
         FileInputStream fis;
         try {
             fis = new FileInputStream(Posting_And_dictionary_path_in_disk + "\\" + "dictionary");
@@ -28,7 +27,7 @@ public class Ranker {
             dictionary=(HashMap) ois.readObject();
             ois.close();
 
-            fis = new FileInputStream(Posting_And_dictionary_path_in_disk + "\\" + "documents");
+            fis = new FileInputStream(Posting_And_dictionary_path_in_disk + "\\" + "docs");
             ObjectInputStream ois1 = new ObjectInputStream(fis);
             documents=(HashMap) ois1.readObject();
             ois1.close();
@@ -41,6 +40,8 @@ public class Ranker {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        this.avdl=avdl();
+
 
     }
 
@@ -52,24 +53,34 @@ public class Ranker {
         return (sum/documents.size());
     }
 
-    public ArrayList<String> Rank(ArrayList<String> query){//returns the docNo sorted by rank
+    public ArrayList<String> Rank(ArrayList<String> query,boolean filter,ArrayList<String> docsFilter){//returns the docNo sorted by rank
         this.query=query;
         Map<String,Double> BM25=new HashMap();
         Map<String,Double> Wij_Wiq=new HashMap();
         Map<String,Double> Wij_2=new HashMap();
         Map<String,Double> Wiq_2=new HashMap();
+        Map<String,Double> AtStart=new HashMap();
         for(int i=0;i<query.size();i++) {
-            RandomAccessFile raf = null;
+            RandomAccessFile raf ;
             try {
-                raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk, "rw");
+                raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting", "rw");
                 long pointer=dictionary.get(query.get(i)).getPointerToPostings();
                 raf.seek(pointer);
                 String postiongForWord=raf.readLine();
+                raf.close();
                 String [] docsWithWord=spliteDocNo(postiongForWord);
                 for(int j=0;j<docsWithWord.length;j++){
                     String docNo=docsWithWord[j].substring(0,docsWithWord[j].indexOf("+"));
+                    if(filter) {
+                        if (!docsFilter.contains(docNo))
+                            continue;
+                    }
                     //atStart
-                    int atStart=Integer.valueOf()
+                    double atStart=Double.valueOf(docsWithWord[j].substring(docsWithWord[j].indexOf("~")+1,docsWithWord[j].length()));
+                    if(AtStart.containsKey(docNo))
+                        AtStart.put(docNo,AtStart.get(docNo)+atStart);
+                    else
+                        AtStart.put(docNo,atStart);
                     //bm25
                     double bm25=BM25(query.get(i),docsWithWord[j],documents.get(docNo).getDocLength());
                     if(BM25.containsKey(docNo))
@@ -96,14 +107,50 @@ public class Ranker {
                     else
                         Wiq_2.put(docNo,wiq);
 
-
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        HashMap<String,Double> finalCosSim=finalCosSim(Wij_Wiq,Wij_2,Wiq_2);
+        return finalCalculate(BM25,finalCosSim,AtStart);
 
     }
+
+    private HashMap<String,Double> finalCosSim(Map<String, Double> wij_wiq, Map<String, Double> wij_2, Map<String, Double> wiq_2) {
+        HashMap<String,Double> ans=new HashMap<>();
+        for(Map.Entry<String,Double> entry: wij_wiq.entrySet()){
+            String docNo=entry.getKey();
+            double mechane=Math.sqrt(wij_2.get(docNo)*wiq_2.get(docNo));
+            double cosSim=(entry.getValue()/mechane);
+            ans.put(docNo,cosSim);
+        }
+        return ans;
+    }
+
+    private ArrayList<String> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart) {
+        HashMap<String,Double> rank=new HashMap<>();
+        for(Map.Entry<String,Double> entry: bm25.entrySet()){
+            String docNo=entry.getKey();
+            double Rank=entry.getValue()*1+cosSim.get(docNo)*0+atStart.get(docNo)*0;
+            rank.put(docNo,Rank);
+        }
+
+        LinkedList<Map.Entry<String, Double>> list = new LinkedList<>(rank.entrySet());
+        list.sort(new Comparator<Map.Entry<String, Double>>() {
+            @Override
+            public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) {
+                return o2.getValue().compareTo(o1.getValue());
+            }
+        });
+        ArrayList<String> bestRank=new ArrayList<>();
+        for(int i=0;i<list.size();i++){
+            bestRank.add(list.get(i).getKey());
+        }
+
+        return bestRank;
+    }
+
 
 
 
@@ -117,7 +164,7 @@ public class Ranker {
         double k=0.75;
         double b=0.75;
         int CWQ=calculateWordFreqQuery(word);
-        int CWD=Integer.valueOf(docNo.substring(docNo.indexOf("+"),docNo.indexOf("~")));
+        int CWD=Integer.valueOf(docNo.substring(docNo.indexOf("+")+1,docNo.indexOf("~")));
         double mone=(k+1)*CWD;
         double mechne=CWD+(k*(1-b+(b*(docLen/avdl))));
         double calculat=CWQ*(mone/mechne);
@@ -135,7 +182,7 @@ public class Ranker {
 
 
     public double Wij_Wiq(String docNo,int docLen,int df,int i){
-        int fi=Integer.valueOf(docNo.substring(docNo.indexOf("+"),docNo.length()));
+        int fi=Integer.valueOf(docNo.substring(docNo.indexOf("+")+1,docNo.indexOf("~")));
         double tfi=fi/docLen;
         if(i==1)
             return tfi*df;
@@ -146,13 +193,7 @@ public class Ranker {
     }
 
 
-    public double HeadLine(String word, Documentt d){
 
-    }
-
-    public double AtStart(String ){
-
-    }
 
 
 
