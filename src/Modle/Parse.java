@@ -10,7 +10,7 @@ import java.util.Set;
 
 public class Parse {
     private String[] SplitDoc;
-    private Map<String,Integer> Tokens;
+    private Map<String,TokenInfo> Tokens;
     private Map <String,String> months;
     private Set<String> stop_words;
     private HashMap <String,City> cities;
@@ -136,7 +136,7 @@ public class Parse {
         return false;
     }
 
-    public Map<String,Integer> getParsing(String text,String DocNo,boolean wantToSteam) {
+    public Map<String,TokenInfo> getParsing(String text,String DocNo,boolean wantToSteam) {
         this.wantToSteam=wantToSteam;
         if(wantToSteam)
             stemmer=new Stemmer();
@@ -194,12 +194,12 @@ public class Parse {
             if(months.containsKey(token0)) {
                 if ((!token1.equals("")) && OnlyDigits(token1)) {
                     //day or year
-                    i+=idDate(token0,token1);
+                    i+=idDate(token0,token1,i);
                     continue;
                 }
 
                 else
-                    justAdd(token0);
+                    justAdd(token0,i);
                 continue;
             }
 
@@ -207,24 +207,24 @@ public class Parse {
                 float valueOfT0 = Float.parseFloat(token0);
                 //precent case
                 if(token1.equals("percent")||token1.equals("percentage")){
-                    add_To_tokens_map(token0+"%");
+                    add_To_tokens_map(token0+"%",i);
                     i++;
                     continue;
                 }
                 if(token1.equals("Dollars")){
                     if(token0.contains(".")) {
-                        add_To_tokens_map(token0 + " Dollars");
+                        add_To_tokens_map(token0 + " Dollars",i);
                         i++;
                         continue;
                     }
                     if(valueOfT0<1000000) {
-                        add_To_tokens_map(token0 + " Dollars");
+                        add_To_tokens_map(token0 + " Dollars",i);
                         i++;
                         continue;
                     }
                     else {
                         String tmp=String.valueOf(valueOfT0/1000000);
-                        justAdd(tmp.substring(0,tmp.length()-2)+" M Dollars");
+                        justAdd(tmp.substring(0,tmp.length()-2)+" M Dollars",i);
                         i++;
                         continue;
                     }
@@ -237,55 +237,55 @@ public class Parse {
                     else if(token1.equals("trillion"))
                         kofel=1000000;
                     String tmp=String.valueOf(valueOfT0*kofel);
-                    justAdd(tmp.substring(0,tmp.length()-2)+" M Dollars");
+                    justAdd(tmp.substring(0,tmp.length()-2)+" M Dollars",i);
                     i=i+3;
                     continue;
                 } else if (token1.contains("-")) {
                     i += num_word_Makaf_word(token0,i);
                     continue;
                 } else if (token1.equals("Thousand")) {
-                    add_To_tokens_map(numberFormat(token0 + "000"));
+                    add_To_tokens_map(numberFormat(token0 + "000"),i);
                     i++;
                     continue;
                 } else if (token1.equals("Million")) {
-                    add_To_tokens_map(token0 + "M");
+                    add_To_tokens_map(token0 + "M",i);
                     i++;
                     continue;
                 } else if (token1.equals("Billion")) {
-                    add_To_tokens_map(token0 + "B");
+                    add_To_tokens_map(token0 + "B",i);
                     i++;
                     continue;
                 } else if (token1.equals("Trillion")) {
-                    add_To_tokens_map(token0 + "00B");
+                    add_To_tokens_map(token0 + "00B",i);
                     i++;
                     continue;
                 } else if (months.containsKey(token1)) {  //14 May
                     if(OnlyDigits(token0))
-                        i+=idDate(token1,token0);
-                    else justAdd(token0);
+                        i+=idDate(token1,token0,i);
+                    else justAdd(token0,i);
                     continue;
                 } else if (token1.equals("m") && token2.equals("Dollars")) {
-                    add_To_tokens_map(token0 + " M" + " Dollars");
+                    add_To_tokens_map(token0 + " M" + " Dollars",i);
                     i += 2;
                     continue;
                 } else if (token1.equals("bn") &&token2.equals("Dollars")) {
-                    add_To_tokens_map(token0 + "000" + " M Dollars");
+                    add_To_tokens_map(token0 + "000" + " M Dollars",i);
                     i += 2;
                     continue;
                 } else if (token1.contains("/") && token2.equals("Dollars")) {
                     if (IsFraction(token1)) {
-                        add_To_tokens_map(token0 + " " + token1 + " Dollars");
+                        add_To_tokens_map(token0 + " " + token1 + " Dollars",i);
                         i += 2;
                         continue;
                     }
                 } else if (token1.contains("/")) {
                     if (IsFraction(token1)) {
-                        add_To_tokens_map(token0 + " " + token1);
+                        add_To_tokens_map(token0 + " " + token1,i);
                         i++;
                         continue;
                     }
                 } else {   //regular number alone
-                    add_To_tokens_map(numberFormat(token0));
+                    add_To_tokens_map(numberFormat(token0),i);
                     continue;
                 }
             }
@@ -300,8 +300,8 @@ public class Parse {
 
             if (A__B_Shape(token0)) {//////our role
                 String[] toadd = token0.split("--");
-                justAdd(toadd[0]);
-                justAdd(toadd[1]);
+                justAdd(toadd[0],i);
+                justAdd(toadd[1],i);
                 continue;
             }
 
@@ -315,7 +315,7 @@ public class Parse {
 
             else if (token0.length() - 1 > 0 && token0.charAt(token0.length() - 1) == '%') {
                 if (token0.length() >= 2 && IsNumber(token0.substring(0, token0.length() - 2))) {
-                    add_To_tokens_map(token0.replace("%", "") + "%");
+                    add_To_tokens_map(token0.replace("%", "") + "%",i);
                     continue;
                 }
 
@@ -327,25 +327,25 @@ public class Parse {
                     value = Float.parseFloat(str);
                 } else{
                     if(str.length()>1)
-                        justAdd(str);
+                        justAdd(str,i);
                     continue;
                 }
                 if (i + 1 < SplitDoc.length && (token1.equals("million")||token1.equals("Million"))) {
-                    add_To_tokens_map(str + " M Dollars");
+                    add_To_tokens_map(str + " M Dollars",i);
                     i++;
                     continue;
                 } else if (i + 1 < SplitDoc.length && (token1.equals("billion")||token1.equals("Billion"))) {
                     String Tmp=String.valueOf(value * 1000);
-                    add_To_tokens_map(Tmp.substring(0,Tmp.length()-2) + " M Dollars");
+                    add_To_tokens_map(Tmp.substring(0,Tmp.length()-2) + " M Dollars",i);
                     i++;
                     continue;
                 } else if (value < 1000000&&value>0) {
-                    add_To_tokens_map(str + " Dollars");
+                    add_To_tokens_map(str + " Dollars",i);
                     continue;
                 }
                 else {
                     String Tmp=String.valueOf(value / 1000000);
-                    add_To_tokens_map( Tmp.substring(0,Tmp.length()-2)+ " M Dollars");
+                    add_To_tokens_map( Tmp.substring(0,Tmp.length()-2)+ " M Dollars",i);
                     continue;
                 }
             }
@@ -353,7 +353,7 @@ public class Parse {
                 updateCities(token0,DocNo,i);
                 continue;
             }
-            AddAndRemoveStopWords(token0);
+            AddAndRemoveStopWords(token0,i);
 
 
         }
@@ -372,7 +372,7 @@ public class Parse {
         //check if this city already exist in this doc-add 1 to location
         cities.get(token0.toUpperCase()).docExistANdAdd(docNo,i+"");
 
-        add_To_tokens_map(token0.toUpperCase());
+        add_To_tokens_map(token0.toUpperCase(),i);
     }
 
     private String KMB(String detail) {
@@ -450,14 +450,14 @@ public class Parse {
                     num_Return++;
                 }
             }
-            add_To_tokens_map(w1 + "-" + w2);
+            add_To_tokens_map(w1 + "-" + w2,i);
         }
         return num_Return;
     }
     private void betweenHandle(int i) {
         String num1=SplitDoc[i+1];
         String num2=SplitDoc[i+3];
-        add_To_tokens_map("between "+num1+" and "+num2);
+        add_To_tokens_map("between "+num1+" and "+num2,i);
 
     }
 
@@ -465,7 +465,7 @@ public class Parse {
         int returnValue=0;
         String[] arr=SplitDoc[i].split("-");
         if(arr.length==3) {              //word-word-word
-            justAdd(arr[0] + "-" + arr[1] + "-" + arr[2]);
+            justAdd(arr[0] + "-" + arr[1] + "-" + arr[2],i);
         }
         else if(arr.length==2) {                         //w-w / w-n / n-w / n-n
             String w1=""; String w2="";
@@ -498,14 +498,14 @@ public class Parse {
             }
             //our role
             else if(arr[1].equals("percent")||arr[1].equals("percentage")){
-                justAdd(w1+"%");
+                justAdd(w1+"%",i);
                 returnValue++;
                 return returnValue;
             }
 
             else
                 w2=arr[1];
-            justAdd(w1+"-"+w2);
+            justAdd(w1+"-"+w2,i);
         }
         return returnValue;
     }
@@ -543,21 +543,21 @@ public class Parse {
         }
     }
 
-    private int idDate(String token0, String token1) {
+    private int idDate(String token0, String token1,int i) {
         String dayYear = "";
         if (token1.length() == 1) {
             dayYear = "0" + token1;
-            justAdd(months.get(token0) + "-" + dayYear);
+            justAdd(months.get(token0) + "-" + dayYear,i);
             return 1;
         }
         if (token1.length() == 2) {
             dayYear = token1;
-            justAdd(months.get(token0) + "-" + token1);
+            justAdd(months.get(token0) + "-" + token1,i);
             return 1;
         }
         if (token1.length() == 4) {
             dayYear = token1;
-            justAdd(token1 + "-" + months.get(token0));
+            justAdd(token1 + "-" + months.get(token0),i);
             return 1;
         }
         return 0;
@@ -571,7 +571,7 @@ public class Parse {
         return true;
     }
 
-    private void justAdd(String toAdd) {
+    private void justAdd(String toAdd,int i) {
         if(toAdd.length()>2&&toAdd.charAt(0)=='-'&&(toAdd.charAt(1)=='\''||toAdd.charAt(1)=='-'||toAdd.charAt(1)=='/'||toAdd.charAt(1)=='%'||toAdd.charAt(1)=='$')) {
             toAdd = toAdd.substring(2, toAdd.length());
             if(Character.isUpperCase(toAdd.charAt(0)))
@@ -584,10 +584,10 @@ public class Parse {
         }
         if(Character.isUpperCase(toAdd.charAt(0)))
             toAdd=toAdd.toUpperCase();
-        add_To_tokens_map(toAdd);
+        add_To_tokens_map(toAdd,i);
     }
 
-    private void add_To_tokens_map(String add) {
+    private void add_To_tokens_map(String add,int i) {
         try {
             if (add.equals("")) return;
             if (wantToSteam) {//user chosen stem option
@@ -611,22 +611,28 @@ public class Parse {
             }
 
             if (Tokens.containsKey(add))
-                Tokens.put(add, Tokens.get(add) + 1);
+               Tokens.get(add).setFrequentInDoc(Tokens.get(add).frequentInDoc+1);
             else
-                Tokens.put(add, 1);
+                Tokens.put(add,new TokenInfo(1,atStart(i)));
         }
         catch (IndexOutOfBoundsException e){
 
         }
     }
 
+    private boolean atStart(int i) {
+        if(i<SplitDoc.length/5)
+            return true;
+        return false;
+    }
 
-    private void AddAndRemoveStopWords(String toAdd) {
+
+    private void AddAndRemoveStopWords(String toAdd,int i) {
         if(IsStopWord(toAdd)) return;
         if(IsSymbol(toAdd)) return;
         if(Character.isUpperCase(toAdd.charAt(0)))
             toAdd=toAdd.toUpperCase();
-        add_To_tokens_map(toAdd);
+        add_To_tokens_map(toAdd,i);
     }
 
     private boolean IsSymbol(String toAdd) {

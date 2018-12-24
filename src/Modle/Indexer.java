@@ -103,7 +103,7 @@ public class Indexer {
             Map<String, String> temporary_posting = new HashMap<>();
             for(Map<Documentt,String> documents_To_parse: listtttt) {
                 for (Map.Entry<Documentt, String> entry : documents_To_parse.entrySet()) {
-                    Map<String, Integer> terms_after_parser = parser.getParsing(entry.getValue(),entry.getKey().Doc_Name,wantToStemm);
+                    Map<String, TokenInfo> terms_after_parser = parser.getParsing(entry.getValue(),entry.getKey().Doc_Name,wantToStemm);
 
                     //update info on document, and add it to the docs dictionary
                     Documentt tmp = entry.getKey();
