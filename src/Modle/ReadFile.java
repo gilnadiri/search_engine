@@ -90,6 +90,8 @@ public class ReadFile {
 
             Documentt d=new Documentt(s2[0],-1,-1,"",-1);
 
+
+
             String []text=s2[1].split("<TEXT>\n");
             if(text.length<2)
                 continue;

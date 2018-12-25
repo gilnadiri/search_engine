@@ -202,7 +202,7 @@ public class Indexer {
         });
         ArrayList<String> top_5=new ArrayList<>();
         for(int i=0;i<5;i++)
-            top_5.add(list.get(i).getKey());
+            top_5.add(list.get(i).getKey()+"+"+list.get(i).getValue());
         return top_5;
     }
 

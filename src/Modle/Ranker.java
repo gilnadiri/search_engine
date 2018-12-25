@@ -48,8 +48,8 @@ public class Ranker {
         int sum=0;
         for (Map.Entry<String,Documentt> entry : documents.entrySet()) {
             sum+=entry.getValue().getDocLength();
-       }
-       return (sum/documents.size());
+        }
+        return (sum/documents.size());
     }
 
     public ArrayList<String> Rank(ArrayList<String> query){//returns the docNo sorted by rank
