@@ -18,6 +18,8 @@ public class main {
       ArrayList<String> list=top_five_yeshooyot(map);
       int i=0;
       int k=9;
+              int j=0;
+
 
 
 
@@ -46,8 +48,10 @@ public class main {
 
 
     public static void test1(){
-        Indexer test=new Indexer(false,"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\testCorpus","C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\dest");
+        Indexer test=new Indexer(false,"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\corpus","C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\dest");
         test.iniateIndex();
+        //Ranker ranker=new Ranker("C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\dest");
+
 
     }
 }

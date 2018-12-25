@@ -1,10 +1,10 @@
 package Modle;
 
+import javax.swing.text.html.ListView;
 import java.awt.*;
+import java.awt.List;
 import java.io.*;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Ranker {
     public Map<String,Documentt> documents; //information on every doc
@@ -52,12 +52,13 @@ public class Ranker {
         return (sum/documents.size());
     }
 
-    public ArrayList<String> Rank(ArrayList<String> query){//returns the docNo sorted by rank
+    public ArrayList<String> Rank(ArrayList<String> query,boolean filter,ArrayList<String> docsFilter){//returns the docNo sorted by rank
         this.query=query;
         Map<String,Double> BM25=new HashMap();
         Map<String,Double> Wij_Wiq=new HashMap();
         Map<String,Double> Wij_2=new HashMap();
         Map<String,Double> Wiq_2=new HashMap();
+        Map<String,Double> AtStart=new HashMap();
         for(int i=0;i<query.size();i++) {
             RandomAccessFile raf = null;
             try {
@@ -68,15 +69,23 @@ public class Ranker {
                 String [] docsWithWord=spliteDocNo(postiongForWord);
                 for(int j=0;j<docsWithWord.length;j++){
                     String docNo=docsWithWord[j].substring(0,docsWithWord[j].indexOf("+"));
+                    if(filter) {
+                        if (!docsFilter.contains(docNo))
+                            continue;
+                    }
                     //atStart
-                    int atStart=Integer.valueOf()
+                    double atStart=Double.valueOf(docsWithWord[j].substring(docsWithWord[j].indexOf("~")+1,docsWithWord[j].length()));
+                    if(AtStart.containsKey(docNo))
+                        AtStart.put(docNo,AtStart.get(docNo)+atStart);
+                    else
+                        AtStart.put(docNo,atStart);
                     //bm25
-                    double bm25=BM25(query.get(i),docsWithWord[j],documents.get(docNo).getDocLength());
+                    int df=dictionary.get(query.get(i)).getDf();
+                    double bm25=BM25(query.get(i),docsWithWord[j],documents.get(docNo).getDocLength(),df);
                     if(BM25.containsKey(docNo))
                         BM25.put(docNo,BM25.get(docNo)+bm25);
                     else
                         BM25.put(docNo,bm25);
-                    int df=dictionary.get(query.get(i)).getDf();
                     //1=wij*wiq
                     double wij_wiq=Wij_Wiq(docsWithWord[j],documents.get(docNo).getDocLength(),df,1);
                     if(Wij_Wiq.containsKey(docNo))
@@ -96,14 +105,50 @@ public class Ranker {
                     else
                         Wiq_2.put(docNo,wiq);
 
-
                 }
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+        HashMap<String,Double> finalCosSim=finalCosSim(Wij_Wiq,Wij_2,Wiq_2);
+        return finalCalculate(BM25,finalCosSim,AtStart);
 
     }
+
+    private HashMap<String,Double> finalCosSim(Map<String, Double> wij_wiq, Map<String, Double> wij_2, Map<String, Double> wiq_2) {
+        HashMap<String,Double> ans=new HashMap<>();
+        for(Map.Entry<String,Double> entry: wij_wiq.entrySet()){
+            String docNo=entry.getKey();
+            double mechane=Math.sqrt(wij_2.get(docNo)*wiq_2.get(docNo));
+            double cosSim=(entry.getValue()/mechane);
+            ans.put(docNo,cosSim);
+        }
+        return ans;
+    }
+
+    private ArrayList<String> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart) {
+        HashMap<String,Double> rank=new HashMap<>();
+        for(Map.Entry<String,Double> entry: bm25.entrySet()){
+            String docNo=entry.getKey();
+            double Rank=entry.getValue()*0.4+cosSim.get(docNo)*0.4+atStart.get(docNo)*0.2;
+            rank.put(docNo,Rank);
+        }
+
+        LinkedList<Map.Entry<String, Double>> list = new LinkedList<>(rank.entrySet());
+        list.sort(new Comparator<Map.Entry<String, Double>>() {
+            @Override
+            public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) {
+                return o1.getValue().compareTo(o2.getValue());
+            }
+        });
+        ArrayList<String> bestRank=new ArrayList<>();
+        for(int i=0;i<50&&i<list.size();i++){
+            bestRank.add(list.get(i).getKey());
+        }
+
+        return bestRank;
+    }
+
 
 
 
@@ -113,15 +158,18 @@ public class Ranker {
     }
 
 
-    public double BM25(String word,String docNo,int docLen){
+    public double BM25(String word,String docNo,int docLen,int df){
         double k=0.75;
         double b=0.75;
+        double M=0.75;
         int CWQ=calculateWordFreqQuery(word);
-        int CWD=Integer.valueOf(docNo.substring(docNo.indexOf("+"),docNo.indexOf("~")));
+        int CWD=Integer.valueOf(docNo.substring(docNo.indexOf("+")+1,docNo.indexOf("~")));
         double mone=(k+1)*CWD;
         double mechne=CWD+(k*(1-b+(b*(docLen/avdl))));
-        double calculat=CWQ*(mone/mechne);
-        return calculat;
+        double logMone=M+1;
+        double logCalculat=Math.log(logMone/df);
+        double leftSide=CWQ*(mone/mechne);
+        return leftSide*logCalculat;
     }
 
 
@@ -146,13 +194,7 @@ public class Ranker {
     }
 
 
-    public double HeadLine(String word, Documentt d){
 
-    }
-
-    public double AtStart(String ){
-
-    }
 
 
 
