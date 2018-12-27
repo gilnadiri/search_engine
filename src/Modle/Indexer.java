@@ -111,7 +111,7 @@ public class Indexer {
                     tmp.setDoc_uniqe_words(terms_after_parser.size());
                     tmp.setDoc_max_tf(details[0]);
                     tmp.setDocLength(details[1]);
-                    tmp.setYeshooyot(top_five_yeshooyot(terms_after_parser));
+                   // tmp.setYeshooyot(top_five_yeshooyot(terms_after_parser));
                     documents.put(tmp.getDoc_Name(),tmp);
                     //
 
@@ -338,12 +338,24 @@ public class Indexer {
         int frequncy=0;
         for(int i=0;i<curLine.length();i++)
             if(curLine.charAt(i)=='+') {
-                String c=curLine.charAt(i+1)+"";
+                //String c=curLine.charAt(i+1)+"";
+                String c=num(curLine,i);
                 int f=Integer.valueOf(c);
                 frequncy = frequncy + f;
             }
         return frequncy;
     }
+
+    private String num(String curLine, int i) {
+        String ans="";
+        for(int x=i+1;x<curLine.length();x++){
+            if(curLine.charAt(x)=='~')
+                break;
+            ans+=curLine.charAt(x);
+        }
+        return ans;
+    }
+
     private File[] ignoreStopWords(File[] DirsAndSW) {
         int j=0;
         File[] Dirs=new File[DirsAndSW.length-1];
@@ -461,7 +473,7 @@ public class Indexer {
     }
     //</editor-fold>
 
-    //<editor-fold desc="load from disk">
+
     public boolean loadDic(boolean wantToStem, String destination) {
         File f;
        if(wantToStem)
@@ -478,28 +490,117 @@ public class Indexer {
 
     }
 
-    private void load_Documents(boolean wantToStem, String destination) {
-        FileInputStream fis;
-        try {
-            if (wantToStem)
-                fis = new FileInputStream(destination + "\\" + "docs stem");
-            else
-                fis = new FileInputStream(destination + "\\" + "docs");
 
-            ObjectInputStream ois = new ObjectInputStream(fis);
-            documents=(HashMap) ois.readObject();
-            ois.close();
-            fis.close();
-        }
-        catch (FileNotFoundException e) {
+    public int numOfDocs() {
+        return documents.size();
+    }
+
+    public int numOfTerms() {
+        return dictionary.size();
+    }
+
+    public int numOfCities() {
+        return cities_index.size();
+    }
+
+
+
+
+    private void save_cities_index_in_disk() {
+        FileOutputStream fos = null;
+        try {
+            if(wantToStemm)
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities stem" );
+            else
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities" );
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(cities_index);
+            oos.close();
+            fos.close();
+
+        } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
     }
 
+
+
+
+
+    private void save_Dictionary_in_disk(){
+        FileWriter fos = null;
+        try {
+            if(wantToStemm)
+                fos = new FileWriter(Posting_And_dictionary_path_in_disk + "\\" +"dictionary stem" );
+            else
+                fos = new FileWriter(Posting_And_dictionary_path_in_disk + "\\" +"dictionary" );
+            PrintWriter pw = new PrintWriter(fos);
+            String line;
+            for(Map.Entry<String,Term> entry: dictionary.entrySet()) {
+                line = entry.getValue().toString();
+                pw.println(line);
+
+            }
+            pw.close();
+            fos.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+/*
+    private void save_Dictionary_in_disk() {
+        FileOutputStream fos = null;
+        try {
+            if(wantToStemm)
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"dictionary stem" );
+            else
+                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"dictionary" );
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(dictionary);
+            oos.close();
+            fos.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+  */
+
+
+
+
+    private void load_dictionary(boolean wantToStem, String destination){
+        BufferedReader br;
+        try {
+            if(wantToStem)
+             br = new BufferedReader(new FileReader(new File(destination + "\\" + "dictionary stem")));
+            else
+                br=new BufferedReader(new FileReader(new File(destination + "\\" + "dictionary")));
+
+            String line;
+             while ( (line = br.readLine()) != null )
+             {
+                 String[] s=line.split("#");
+                 Term term=new Term(s[0],Long.parseLong(s[1]),Integer.valueOf(s[2]),Integer.valueOf(s[3]));
+                 dictionary.put(term.getTerm(),term);
+             }
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+  /*
     private void load_dictionary(boolean wantToStem, String destination) {
         FileInputStream fis;
         try {
@@ -521,31 +622,28 @@ public class Indexer {
             e.printStackTrace();
         }
     }
+*/
 
-    public int numOfDocs() {
-        return documents.size();
-    }
 
-    public int numOfTerms() {
-        return dictionary.size();
-    }
 
-    public int numOfCities() {
-        return cities_index.size();
-    }
-    //</editor-fold>
 
-    //<editor-fold desc="save in disk">
-    private void save_Docs_map_in_disk() {
-        FileOutputStream fos = null;
+
+
+    private void save_Docs_map_in_disk(){
+        FileWriter fos = null;
         try {
             if(wantToStemm)
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"docs stem" );
+                fos = new FileWriter(Posting_And_dictionary_path_in_disk + "\\" +"docs stem" );
             else
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"docs" );
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(documents);
-            oos.close();
+                fos = new FileWriter(Posting_And_dictionary_path_in_disk + "\\" +"docs" );
+            PrintWriter pw = new PrintWriter(fos);
+            String line;
+            for(Map.Entry<String,Documentt> entry: documents.entrySet()) {
+                line = entry.getValue().toString();
+                pw.println(line);
+
+            }
+            pw.close();
             fos.close();
 
         } catch (FileNotFoundException e) {
@@ -554,46 +652,81 @@ public class Indexer {
             e.printStackTrace();
         }
 
-    }
 
-    private void save_cities_index_in_disk() {
-        FileOutputStream fos = null;
+}
+    /*
+       private void save_Docs_map_in_disk() {
+           FileOutputStream fos = null;
+           try {
+               if(wantToStemm)
+                   fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"docs stem" );
+               else
+                   fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"docs" );
+               ObjectOutputStream oos = new ObjectOutputStream(fos);
+               oos.writeObject(documents);
+               oos.close();
+               fos.close();
+
+           } catch (FileNotFoundException e) {
+               e.printStackTrace();
+           } catch (IOException e) {
+               e.printStackTrace();
+           }
+
+       }
+   */
+
+
+
+
+
+    private void load_Documents(boolean wantToStem, String destination) {
         try {
-            if(wantToStemm)
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities stem" );
+            BufferedReader br;
+            if(wantToStem)
+                 br = new BufferedReader(new FileReader(new File(destination + "\\" + "docs stem")));
             else
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities" );
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(cities_index);
-            oos.close();
-            fos.close();
+                br=new BufferedReader(new FileReader(new File(destination + "\\" + "docs")));
+
+            String line;
+            while ( (line = br.readLine()) != null )
+            {
+                String[] s=line.split("#");
+                Documentt documett=new Documentt(s[0],Integer.valueOf(s[1]),Integer.valueOf(s[3]),s[4],Integer.valueOf(s[2]));
+                documents.put(documett.Doc_Name,documett);
+            }
+
 
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
+
     }
-
-    private void save_Dictionary_in_disk() {
-        FileOutputStream fos = null;
+/*
+    private void load_Documents(boolean wantToStem, String destination) {
+        FileInputStream fis;
         try {
-            if(wantToStemm)
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"dictionary stem" );
+            if (wantToStem)
+                fis = new FileInputStream(destination + "\\" + "docs stem");
             else
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"dictionary" );
-            ObjectOutputStream oos = new ObjectOutputStream(fos);
-            oos.writeObject(dictionary);
-            oos.close();
-            fos.close();
+                fis = new FileInputStream(destination + "\\" + "docs");
 
-        } catch (FileNotFoundException e) {
+            ObjectInputStream ois = new ObjectInputStream(fis);
+            documents=(HashMap) ois.readObject();
+            ois.close();
+            fis.close();
+        }
+        catch (FileNotFoundException e) {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (ClassNotFoundException e) {
+            e.printStackTrace();
         }
     }
-    //</editor-fold>
+*/
 
 }
 

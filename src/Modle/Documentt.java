@@ -9,13 +9,15 @@ public class Documentt implements Serializable {
     private int DocLength;   //num of words
     public int Doc_uniqe_words;
     private String Doc_City;
-    private ArrayList<String> Yeshooyot;  //the top 5 yeshoohoyot in the doc-from the most stronget to less stronger
+    //private ArrayList<String> Yeshooyot;  //the top 5 yeshoohoyot in the doc-from the most stronget to less stronger
 
 
+    @Override
+    public String toString() {
 
+        return Doc_Name+"#"+Doc_max_tf+"#"+DocLength+"#"+Doc_uniqe_words+"#"+Doc_City;
 
-
-
+    }
 
     public Documentt(String doc_Name, int doc_max_tf, int doc_uniqe_words, String doc_City, int docLength) {
         Doc_Name = doc_Name;
@@ -23,14 +25,14 @@ public class Documentt implements Serializable {
         Doc_uniqe_words = doc_uniqe_words;
         Doc_City = doc_City;
         DocLength = docLength;
-        Yeshooyot=new ArrayList<>();
+        //Yeshooyot=new ArrayList<>();
 
     }
 
     public int getDocLength() {
         return DocLength;
     }
-
+/*
     public ArrayList<String> getYeshooyot() {
         return Yeshooyot;
     }
@@ -38,7 +40,7 @@ public class Documentt implements Serializable {
     public void setYeshooyot(ArrayList<String> yeshooyot) {
         Yeshooyot = yeshooyot;
     }
-
+*/
     public void setDocLength(int docLength) {
         DocLength = docLength;
     }

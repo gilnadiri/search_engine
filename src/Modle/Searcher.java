@@ -8,7 +8,7 @@ public class Searcher {
     private Ranker ranker;
 
     public Searcher (String postingindisk){
-        this.ranker=new Ranker(postingindisk);
+        this.ranker=new Ranker(postingindisk,false);
     }
 
    public ArrayList<Map.Entry<String,Double>> Search_query(String query,boolean stem,boolean semantic_treatment ,ArrayList<String> cities_limitation,String corpuspath )
@@ -24,6 +24,14 @@ public class Searcher {
        ArrayList<String> parsed_query=new ArrayList<>();
        for(Map.Entry<String,TokenInfo> entry: parsedQuery.entrySet())
            parsed_query.add(entry.getKey());
+
+
+
+
+
+
+
+
 
        ArrayList<Map.Entry<String,Double>> results=ranker.Rank(parsed_query,false,new ArrayList<String>());
        return results;
