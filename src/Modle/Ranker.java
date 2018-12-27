@@ -172,7 +172,7 @@ public class Ranker {
         return leftSide*logCalculat;
     }
 
-
+////
     private int calculateWordFreqQuery(String word) {
         int ans=0;
         for(int i=0;i<query.size();i++)
