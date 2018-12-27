@@ -12,6 +12,7 @@ public class Ranker {
     public ArrayList<String> query;
     private String Posting_And_dictionary_path_in_disk;
     int avdl;
+    int i;
 
 
 
@@ -20,7 +21,6 @@ public class Ranker {
         this.documents = new HashMap<>();
         this.dictionary=new HashMap<>();
         this.Posting_And_dictionary_path_in_disk=Posting_And_dictionary_path_in_disk;
-        this.avdl=avdl();
         FileInputStream fis;
         try {
             fis = new FileInputStream(Posting_And_dictionary_path_in_disk + "\\" + "dictionary");
@@ -28,7 +28,7 @@ public class Ranker {
             dictionary=(HashMap) ois.readObject();
             ois.close();
 
-            fis = new FileInputStream(Posting_And_dictionary_path_in_disk + "\\" + "documents");
+            fis = new FileInputStream(Posting_And_dictionary_path_in_disk + "\\" + "docs");
             ObjectInputStream ois1 = new ObjectInputStream(fis);
             documents=(HashMap) ois1.readObject();
             ois1.close();
@@ -41,6 +41,8 @@ public class Ranker {
         } catch (ClassNotFoundException e) {
             e.printStackTrace();
         }
+        this.avdl=avdl();
+
 
     }
 
@@ -62,7 +64,7 @@ public class Ranker {
         for(int i=0;i<query.size();i++) {
             RandomAccessFile raf = null;
             try {
-                raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk, "rw");
+                raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting", "rw");
                 long pointer=dictionary.get(query.get(i)).getPointerToPostings();
                 raf.seek(pointer);
                 String postiongForWord=raf.readLine();
@@ -130,7 +132,7 @@ public class Ranker {
         HashMap<String,Double> rank=new HashMap<>();
         for(Map.Entry<String,Double> entry: bm25.entrySet()){
             String docNo=entry.getKey();
-            double Rank=entry.getValue()*0.4+cosSim.get(docNo)*0.4+atStart.get(docNo)*0.2;
+            double Rank=entry.getValue()*0+cosSim.get(docNo)*0+atStart.get(docNo)*0;
             rank.put(docNo,Rank);
         }
 
@@ -183,7 +185,7 @@ public class Ranker {
 
 
     public double Wij_Wiq(String docNo,int docLen,int df,int i){
-        int fi=Integer.valueOf(docNo.substring(docNo.indexOf("+"),docNo.length()));
+        int fi=Integer.valueOf(docNo.substring(docNo.indexOf("+")+1,docNo.indexOf("~")));
         double tfi=fi/docLen;
         if(i==1)
             return tfi*df;
