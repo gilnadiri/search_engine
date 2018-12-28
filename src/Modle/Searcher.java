@@ -71,7 +71,7 @@ public class Searcher {
            parsed_query.add(entry.getKey());
 
 
-       ArrayList<Map.Entry<String,Double>> results=ranker.Rank(parsed_query,exist_cities_limitation,fitToLimitation);
+       ArrayList<Map.Entry<String,Double>> results=ranker.Rank(parsed_query,exist_cities_limitation,fitToLimitation,cities_index);
        return results;
 
    }

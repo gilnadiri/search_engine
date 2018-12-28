@@ -1,5 +1,6 @@
 package Modle;
 
+
 import javax.swing.text.html.ListView;
 import java.awt.*;
 import java.awt.List;
@@ -9,6 +10,7 @@ import java.util.*;
 public class Ranker {
     public Map<String,Documentt> documents; //information on every doc
     public Map<String,Term> dictionary;     //inverted index of terms
+    public Map<String,City> cities_index;
     public ArrayList<String> query;
     private String Posting_And_dictionary_path_in_disk;
     double avdl;
@@ -19,6 +21,7 @@ public class Ranker {
     public Ranker(String Posting_And_dictionary_path_in_disk,boolean stem) {
         this.documents = new HashMap<>();
         this.dictionary=new HashMap<>();
+        this.cities_index=new HashMap<>();
         this.Posting_And_dictionary_path_in_disk=Posting_And_dictionary_path_in_disk;
         Load_Dictionary_and_documets(stem,Posting_And_dictionary_path_in_disk);
         this.avdl=avdl();
@@ -85,8 +88,10 @@ public class Ranker {
     }
 
 
-    public ArrayList<Map.Entry<String,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter){//returns the docNo sorted by rank
+    public ArrayList<Map.Entry<String,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter,HashMap<String,City> cities_index){//returns the docNo sorted by rank
         this.query=query;
+        this.cities_index=cities_index;
+        HashMap<String,Double> total=new HashMap<>();
         Map<String,Double> BM25=new HashMap();
         Map<String,Double> Wij_Wiq=new HashMap();
         Map<String,Double> Wij_2=new HashMap();
@@ -96,8 +101,20 @@ public class Ranker {
             RandomAccessFile raf = null;
             try {
                 raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting", "rw");
-                if(!dictionary.containsKey(query.get(i)))
+                if(!dictionary.containsKey(query.get(i))) {
+                    //check if the word is at city tags
+                    //bring the cities index from searcher
+                    //add to finish score with grade 1
+                    if(cities_index.containsKey(query.get(i))) {
+                        //the word exist in city tag but not at text
+                        City toAdd=cities_index.get(i);
+                        HashMap<String,String> loc=toAdd.getLocation();
+                        for(Map.Entry<String,String> entry: loc.entrySet()){
+                            total.put(entry.getKey(),1.0);
+                        }
+                    }
                     continue;
+                }
                 long pointer=dictionary.get(query.get(i)).getPointerToPostings();
                 raf.seek(pointer);
                 String postiongForWord=raf.readLine();
@@ -157,7 +174,7 @@ public class Ranker {
         nirmul(AtStart,maxStart);
 
 
-        return finalCalculate(BM25,finalCosSim,AtStart);
+        return finalCalculate(BM25,finalCosSim,AtStart,total);
 
     }
 
@@ -190,8 +207,7 @@ public class Ranker {
         return ans;
     }
 
-    private ArrayList<Map.Entry<String,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart) {
-       HashMap<String,Double> total=new HashMap<>();
+    private ArrayList<Map.Entry<String,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart,Map<String,Double> total) {
 
         for(Map.Entry<String,Double> entry: bm25.entrySet()) {
             String doc=entry.getKey();
