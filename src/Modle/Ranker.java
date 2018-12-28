@@ -123,7 +123,7 @@ public class Ranker {
                         BM25.put(docNo,bm25);
 
                     //cossim
-                   // double wij=wij(Integer.valueOf(docsWithWord[j].substring(docsWithWord[j].indexOf("+")+1,docNo.indexOf("~"))),documents.size(),df,documents.get(docNo).Doc_max_tf);
+                    // double wij=wij(Integer.valueOf(docsWithWord[j].substring(docsWithWord[j].indexOf("+")+1,docNo.indexOf("~"))),documents.size(),df,documents.get(docNo).Doc_max_tf);
 
 
 

@@ -15,6 +15,11 @@ public class Term implements Serializable {
         this.total_frequncy_in_the_corpus=total_frequncy_in_the_corpus;
     }
 
+    @Override
+    public String toString() {
+        return term+"#"+getPointerToPostings()+"#"+df+"#"+total_frequncy_in_the_corpus;
+    }
+
     public int getTotal_frequncy_in_the_corpus() {
         return total_frequncy_in_the_corpus;
     }

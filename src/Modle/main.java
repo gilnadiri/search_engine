@@ -5,15 +5,15 @@ import java.util.*;
 
 public class main {
     public static void main(String[] args) throws IOException {
-             Searcher searcher=new Searcher("C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\dest");
-      ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_query("blood-alcohol fatalities",false,false,new ArrayList<String>(),"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\corpus");
-      ArrayList<String> judjescore=checkfromfile();
+        // test1();
 
-      relevant_i_back_from_all_the_relevant(myscores,judjescore);
 
-      int i=0;
-      int u=7;
-        System.out.println(i);
+        Searcher searcher=new Searcher("C:\\Users\\gil nadiri\\Desktop\\dest");
+        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_query("blood-alcohol fatalities",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
+        ArrayList<String> judjescore=checkfromfile();
+
+        relevant_i_back_from_all_the_relevant(myscores,judjescore);
+
     }
 
     private static void relevant_i_back_from_all_the_relevant(ArrayList<Map.Entry<String, Double>> myscores, ArrayList<String> judjescore) {
@@ -33,8 +33,8 @@ public class main {
     }
 
     private static ArrayList<String> checkfromfile() throws IOException {
-      ArrayList<String> res=new ArrayList<>();
-       BufferedReader bf= new BufferedReader(new FileReader(new File("C:\\Users\\hoday\\Desktop\\destination" + "\\" + "1.txt")));
+        ArrayList<String> res=new ArrayList<>();
+        BufferedReader bf= new BufferedReader(new FileReader(new File("C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה" + "\\" + "1.txt")));
         for(String line; (line = bf.readLine()) != null; ) {
             if(lineisrelevant(line))
                 res.add(line.split(" ")[2]);
