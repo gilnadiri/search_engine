@@ -111,7 +111,7 @@ public class Indexer {
                     tmp.setDoc_uniqe_words(terms_after_parser.size());
                     tmp.setDoc_max_tf(details[0]);
                     tmp.setDocLength(details[1]);
-                   // tmp.setYeshooyot(top_five_yeshooyot(terms_after_parser));
+                    tmp.setYeshooyot(top_five_yeshooyot(terms_after_parser));
                     documents.put(tmp.getDoc_Name(),tmp);
                     //
 
@@ -506,6 +506,7 @@ public class Indexer {
 
 
 
+
     private void save_cities_index_in_disk() {
         FileOutputStream fos = null;
         try {
@@ -522,6 +523,34 @@ public class Indexer {
             e.printStackTrace();
         }
     }
+
+
+
+
+
+
+
+/*
+    private void save_cities_index_in_disk() {
+        FileOutputStream fos = null;
+        try {
+
+            fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities" );
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
+            oos.writeObject(cities_index);
+            oos.close();
+            fos.close();
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+*/
+
+
 
 
 
@@ -690,7 +719,13 @@ public class Indexer {
             while ( (line = br.readLine()) != null )
             {
                 String[] s=line.split("#");
+                String yeshooyot=s[5];
+                String[] s1 = yeshooyot.split(",");
+                ArrayList<String> yeshooyott=new ArrayList<>();
+                for(int i=0;i<s1.length;i++)
+                    yeshooyott.add(s1[i]);
                 Documentt documett=new Documentt(s[0],Integer.valueOf(s[1]),Integer.valueOf(s[3]),s[4],Integer.valueOf(s[2]));
+                documett.setYeshooyot(yeshooyott);
                 documents.put(documett.Doc_Name,documett);
             }
 

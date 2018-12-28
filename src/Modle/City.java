@@ -25,6 +25,9 @@ public class City implements Serializable {
         this.update=false;
 
     }
+
+    
+
     //for cities we found in tag city
     public City(String city_name, String country, String population, String currency,String docNo) {
         this.city_name = city_name;
