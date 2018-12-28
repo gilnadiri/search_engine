@@ -20,6 +20,12 @@ public class Ranker {
         this.documents = new HashMap<>();
         this.dictionary=new HashMap<>();
         this.Posting_And_dictionary_path_in_disk=Posting_And_dictionary_path_in_disk;
+        Load_Dictionary_and_documets(stem,Posting_And_dictionary_path_in_disk);
+        this.avdl=avdl();
+
+    }
+
+    private void Load_Dictionary_and_documets(boolean stem, String posting_and_dictionary_path_in_disk) {
         FileInputStream fis;
         try {
             BufferedReader br;
@@ -38,8 +44,6 @@ public class Ranker {
             }
 
 
-
-
             BufferedReader br1;
             if(stem)
                 br1 = new BufferedReader(new FileReader(new File(Posting_And_dictionary_path_in_disk + "\\" + "docs stem")));
@@ -49,8 +53,14 @@ public class Ranker {
             String line1;
             while ( (line1 = br1.readLine()) != null )
             {
-                String[] s1=line1.split("#");
-                Documentt documett=new Documentt(s1[0],Integer.valueOf(s1[1]),Integer.valueOf(s1[3]),s1[4],Integer.valueOf(s1[2]));
+                String[] s=line.split("#");
+                String yeshooyot=s[5];
+                String[] s1 = yeshooyot.split(",");
+                ArrayList<String> yeshooyott=new ArrayList<>();
+                for(int i=0;i<s1.length;i++)
+                    yeshooyott.add(s1[i]);
+                Documentt documett=new Documentt(s[0],Integer.valueOf(s[1]),Integer.valueOf(s[3]),s[4],Integer.valueOf(s[2]));
+                documett.setYeshooyot(yeshooyott);
                 documents.put(documett.Doc_Name,documett);
             }
 
@@ -60,10 +70,11 @@ public class Ranker {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        this.avdl=avdl();
-
-
     }
+
+    private void Load_Dictionary(boolean stem, String posting_and_dictionary_path_in_disk) {
+
+            }
 
     private double avdl() {
         double sum=0;
@@ -74,7 +85,7 @@ public class Ranker {
     }
 
 
-    public ArrayList<Map.Entry<String,Double>> Rank(ArrayList<String> query,boolean filter,ArrayList<String> docsFilter){//returns the docNo sorted by rank
+    public ArrayList<Map.Entry<String,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter){//returns the docNo sorted by rank
         this.query=query;
         Map<String,Double> BM25=new HashMap();
         Map<String,Double> Wij_Wiq=new HashMap();
