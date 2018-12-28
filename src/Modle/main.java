@@ -5,11 +5,13 @@ import java.util.*;
 
 public class main {
     public static void main(String[] args) throws IOException {
-        // test1();
+        int y=0;
+        int i=9;
 
 
-        Searcher searcher=new Searcher("C:\\Users\\gil nadiri\\Desktop\\dest");
-        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_query("blood-alcohol fatalities",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
+
+        Searcher searcher=new Searcher("C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\dest");
+        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_query("blood-alcohol fatalities",false,false,new ArrayList<String>(),"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\corpus");
         ArrayList<String> judjescore=checkfromfile();
 
         relevant_i_back_from_all_the_relevant(myscores,judjescore);
@@ -34,7 +36,7 @@ public class main {
 
     private static ArrayList<String> checkfromfile() throws IOException {
         ArrayList<String> res=new ArrayList<>();
-        BufferedReader bf= new BufferedReader(new FileReader(new File("C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה" + "\\" + "1.txt")));
+        BufferedReader bf= new BufferedReader(new FileReader(new File("C:\\Users\\hoday\\Desktop\\destination" + "\\" + "1.txt")));
         for(String line; (line = bf.readLine()) != null; ) {
             if(lineisrelevant(line))
                 res.add(line.split(" ")[2]);

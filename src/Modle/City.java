@@ -14,7 +14,7 @@ public class City implements Serializable {
     private boolean update;
 
 
-
+//for city we update from parser
     public City(String city_name, String country, String population, String currency) {
 
         this.city_name = city_name;
@@ -25,7 +25,16 @@ public class City implements Serializable {
         this.update=false;
 
     }
-
+//for cities we found in tag city
+    public City(String city_name, String country, String population, String currency,String docNo) {
+        this.city_name = city_name;
+        this.country = country;
+        this.population = population;
+        this.currency = currency;
+        this.location = new HashMap<>();
+        addLocationToCity(docNo,"title");
+        this.update=false;
+    }
 
     public boolean isUpdate() {
         return update;

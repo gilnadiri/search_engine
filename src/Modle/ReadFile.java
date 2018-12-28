@@ -37,6 +37,8 @@ public class ReadFile {
                     continue;
                 String[] s1 = currentDoc.split("<DOCNO>");
                 String[] s2 = s1[1].split("</DOCNO>");
+                if(s2[0].charAt(0)==' ') s2[0]=s2[0].substring(1);
+                if(s2[0].charAt(s2[0].length()-1)==' ') s2[0]=s2[0].substring(0,s2[0].length()-1);
                 String[] text = s2[1].split("<TEXT>\n");
                 if (text.length < 2)
                     continue;
@@ -45,9 +47,12 @@ public class ReadFile {
                     String[] s4 = s3[1].split(" ");
                     for (int j = 0; j < s4.length; j++) {
                         if (!(s4[j].equals("")) && !(s4[j].toUpperCase().equals("THE"))&& !(s4[j].toUpperCase().equals("FOR"))) {
-                            if (allcities.containsKey(s4[j].toUpperCase()))
+                            if (allcities.containsKey(s4[j].toUpperCase())){
+                                allcities.get(s4[j].toUpperCase()).docExistANdAdd(s2[0],"title");
                                 break;
-                            allcities.put(s4[j].toUpperCase(), new City(s4[j].toUpperCase(), "", "", ""));
+
+                            }
+                            allcities.put(s4[j].toUpperCase(), new City(s4[j].toUpperCase(), "", "", "",s2[0]));
                             break;
                         }
                     }
