@@ -6,10 +6,24 @@ import java.util.*;
 public class main {
     public static void main(String[] args) throws IOException {
         // test1();
+      LinkedHashMap<String,Integer> map=new LinkedHashMap<>();
+      map.put("z",1);
+      map.put("a",2);
+      map.put("b",2);
+      map.put("c",3);
+      map.put("d",3);
+      map.put("e",3);
+
+      for(Map.Entry<String,Integer> entry: map.entrySet())
+          System.out.println(entry.getKey());
+
+
 
 
         Searcher searcher=new Searcher("C:\\Users\\gil nadiri\\Desktop\\dest");
-        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_query("blood-alcohol fatalities",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
+        searcher.Search_files_quries("C:\\Users\\gil nadiri\\Desktop\\dest\\queries.txt",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
+
+        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_single_query("blood-alcohol fatalities",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
         ArrayList<String> judjescore=checkfromfile();
 
         relevant_i_back_from_all_the_relevant(myscores,judjescore);
