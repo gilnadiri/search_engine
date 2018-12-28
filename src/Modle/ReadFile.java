@@ -67,17 +67,17 @@ public class ReadFile {
     }
 
     private String add_langues(String s) {
-      String []s1=s.split("<F P=105>");
-      if(s1.length!=1) {
-          String[] s2 = s1[1].split("</F>");
-          String ans="";
-          String s3=s2[0];
-          for(int i=0;i<s3.length();i++)
-              if(s3.charAt(i)!=' ')
-                  ans=ans+s3.charAt(i);
-          return ans;
-      }
-      else return "";
+        String []s1=s.split("<F P=105>");
+        if(s1.length!=1) {
+            String[] s2 = s1[1].split("</F>");
+            String ans="";
+            String s3=s2[0];
+            for(int i=0;i<s3.length();i++)
+                if(s3.charAt(i)!=' ')
+                    ans=ans+s3.charAt(i);
+            return ans;
+        }
+        else return "";
     }
 
     public Map<Documentt, String> readSingleFile(File singleFile) throws IOException

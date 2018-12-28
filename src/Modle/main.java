@@ -5,13 +5,25 @@ import java.util.*;
 
 public class main {
     public static void main(String[] args) throws IOException {
-        int y=0;
-        int i=9;
+        // test1();
+      LinkedHashMap<String,Integer> map=new LinkedHashMap<>();
+      map.put("z",1);
+      map.put("a",2);
+      map.put("b",2);
+      map.put("c",3);
+      map.put("d",3);
+      map.put("e",3);
+
+      for(Map.Entry<String,Integer> entry: map.entrySet())
+          System.out.println(entry.getKey());
 
 
 
-        Searcher searcher=new Searcher("C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\dest");
-        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_query("blood-alcohol fatalities",false,false,new ArrayList<String>(),"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\corpus");
+
+        Searcher searcher=new Searcher("C:\\Users\\gil nadiri\\Desktop\\dest");
+        searcher.Search_files_quries("C:\\Users\\gil nadiri\\Desktop\\dest\\queries.txt",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
+
+        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_single_query("blood-alcohol fatalities",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
         ArrayList<String> judjescore=checkfromfile();
 
         relevant_i_back_from_all_the_relevant(myscores,judjescore);
@@ -36,7 +48,7 @@ public class main {
 
     private static ArrayList<String> checkfromfile() throws IOException {
         ArrayList<String> res=new ArrayList<>();
-        BufferedReader bf= new BufferedReader(new FileReader(new File("C:\\Users\\hoday\\Desktop\\destination" + "\\" + "1.txt")));
+        BufferedReader bf= new BufferedReader(new FileReader(new File("C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה" + "\\" + "1.txt")));
         for(String line; (line = bf.readLine()) != null; ) {
             if(lineisrelevant(line))
                 res.add(line.split(" ")[2]);

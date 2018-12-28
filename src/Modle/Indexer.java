@@ -509,10 +509,8 @@ public class Indexer {
     private void save_cities_index_in_disk() {
         FileOutputStream fos = null;
         try {
-            if(wantToStemm)
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities stem" );
-            else
-                fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities" );
+
+            fos = new FileOutputStream(Posting_And_dictionary_path_in_disk + "\\" +"cities" );
             ObjectOutputStream oos = new ObjectOutputStream(fos);
             oos.writeObject(cities_index);
             oos.close();
