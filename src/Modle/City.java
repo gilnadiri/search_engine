@@ -26,7 +26,7 @@ public class City implements Serializable {
 
     }
 
-    
+
 
     //for cities we found in tag city
     public City(String city_name, String country, String population, String currency,String docNo) {

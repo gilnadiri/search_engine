@@ -113,7 +113,7 @@ public class Indexer {
                     tmp.setDocLength(details[1]);
                     tmp.setYeshooyot(top_five_yeshooyot(terms_after_parser));
                     documents.put(tmp.getDoc_Name(),tmp);
-                    //
+
 
                     for (Map.Entry<String, TokenInfo> entry_of_parsedTerms : terms_after_parser.entrySet()) {
                         String term = entry_of_parsedTerms.getKey();
@@ -201,7 +201,7 @@ public class Indexer {
             }
         });
         ArrayList<String> top_5=new ArrayList<>();
-        for(int i=0;i<5 && list.size()<i;i++)
+        for(int i=0;i<5 && i<list.size();i++)
             top_5.add(list.get(i).getKey()+"+"+list.get(i).getValue());
         return top_5;
     }
@@ -718,12 +718,15 @@ public class Indexer {
             String line;
             while ( (line = br.readLine()) != null )
             {
+                ArrayList<String> yeshooyott = new ArrayList<>();
                 String[] s=line.split("#");
-                String yeshooyot=s[5];
-                String[] s1 = yeshooyot.split(",");
-                ArrayList<String> yeshooyott=new ArrayList<>();
-                for(int i=0;i<s1.length;i++)
-                    yeshooyott.add(s1[i]);
+                if(s.length==6) {
+                    String yeshooyot = s[5];
+                    String[] s1 = yeshooyot.split(",");
+
+                    for (int i = 0; i < s1.length; i++)
+                        yeshooyott.add(s1[i]);
+                }
                 Documentt documett=new Documentt(s[0],Integer.valueOf(s[1]),Integer.valueOf(s[3]),s[4],Integer.valueOf(s[2]));
                 documett.setYeshooyot(yeshooyott);
                 documents.put(documett.Doc_Name,documett);
