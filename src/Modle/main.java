@@ -9,7 +9,7 @@ public class main {
 
 
 
-        Searcher searcher=new Searcher("C:\\Users\\gil nadiri\\Desktop\\dest");
+        Searcher searcher=new Searcher("C:\\Users\\gil nadiri\\Desktop\\dest",false);
         searcher.Search_files_quries("C:\\Users\\gil nadiri\\Desktop\\dest\\queries.txt",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
 
         ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_single_query("piracy",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");

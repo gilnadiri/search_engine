@@ -90,9 +90,9 @@ public class Ranker {
     }
 
 
-    public ArrayList<Map.Entry<String,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter){//returns the docNo sorted by rank
+    public ArrayList<Map.Entry<Documentt,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter){//returns the docNo sorted by rank
         this.query=query;
-        HashMap<String,Double> total=new HashMap<>();
+        HashMap<Documentt,Double> total=new HashMap<>();
         Map<String,Double> BM25=new HashMap();
         Map<String,Double> Wij_Wiq=new HashMap();
         Map<String,Double> Wij_2=new HashMap();
@@ -111,7 +111,7 @@ public class Ranker {
                         City toAdd=cities_index.get(i);
                         HashMap<String,String> loc=toAdd.getLocation();
                         for(Map.Entry<String,String> entry: loc.entrySet()){
-                            total.put(entry.getKey(),1.0);
+                            total.put(documents.get(entry.getKey()),1.0);
                         }
                     }
                     continue;
@@ -208,25 +208,26 @@ public class Ranker {
         return ans;
     }
 
-    private ArrayList<Map.Entry<String,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart,Map<String,Double> total) {
+    private ArrayList<Map.Entry<Documentt,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart,Map<Documentt,Double> total) {
 
         for(Map.Entry<String,Double> entry: bm25.entrySet()) {
             String doc=entry.getKey();
             double newVal=entry.getValue()*0.98+cosSim.get(doc)*0.01+atStart.get(doc)*0.01;
-            total.put(doc,newVal);
+            total.put(documents.get(doc),newVal);
         }
 
-            ArrayList<Map.Entry<String, Double>> list = new ArrayList<>(total.entrySet());
-        list.sort(new Comparator<Map.Entry<String, Double>>() {
+            ArrayList<Map.Entry<Documentt, Double>> list = new ArrayList<>(total.entrySet());
+        list.sort(new Comparator<Map.Entry<Documentt, Double>>() {
             @Override
-            public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) {
+            public int compare(Map.Entry<Documentt, Double> o1, Map.Entry<Documentt, Double> o2) {
                 return o2.getValue().compareTo(o1.getValue());
             }
         });
-        ArrayList<Map.Entry<String, Double>> res = new ArrayList<>();
-        for (int i = 0; i < 50 && i < list.size(); i++)
-            res.add(list.get(i));
-        for (int i = 0; i < res.size(); i++)
+        ArrayList<Map.Entry<Documentt, Double>> res = new ArrayList<>();
+        for (int i = 0; i < 50 && i < list.size(); i++) {
+             res.add(list.get(i));
+        }
+            for (int i = 0; i < res.size(); i++)
             System.out.println(res.get(i).getKey() + "---->" + res.get(i).getValue());
         return res;
 
