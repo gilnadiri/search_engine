@@ -197,7 +197,7 @@ public class Indexer {
         list.sort(new Comparator<Map.Entry<String, Integer>>() {
             @Override
             public int compare(Map.Entry<String, Integer> o1, Map.Entry<String, Integer> o2) {
-               return o2.getValue().compareTo(o1.getValue());
+                return o2.getValue().compareTo(o1.getValue());
             }
         });
         ArrayList<String> top_5=new ArrayList<>();
@@ -405,8 +405,8 @@ public class Indexer {
     }
 
     public ArrayList<Term> showDic() {
-       if(dictionary.size()==0)
-           return null;
+        if(dictionary.size()==0)
+            return null;
 
         ArrayList<Term> list = new ArrayList<>(dictionary.values());
         list.sort(new Comparator<Term>() {
@@ -476,11 +476,11 @@ public class Indexer {
 
     public boolean loadDic(boolean wantToStem, String destination) {
         File f;
-       if(wantToStem)
-         f = new File(destination + "\\" + "dictionary stem");
-       else
-          f=new File(destination + "\\" + "dictionary") ;
-       if(!f.exists()) {
+        if(wantToStem)
+            f = new File(destination + "\\" + "dictionary stem");
+        else
+            f=new File(destination + "\\" + "dictionary") ;
+        if(!f.exists()) {
             return false;
         }
 
@@ -607,17 +607,17 @@ public class Indexer {
         BufferedReader br;
         try {
             if(wantToStem)
-             br = new BufferedReader(new FileReader(new File(destination + "\\" + "dictionary stem")));
+                br = new BufferedReader(new FileReader(new File(destination + "\\" + "dictionary stem")));
             else
                 br=new BufferedReader(new FileReader(new File(destination + "\\" + "dictionary")));
 
             String line;
-             while ( (line = br.readLine()) != null )
-             {
-                 String[] s=line.split("#");
-                 Term term=new Term(s[0],Long.parseLong(s[1]),Integer.valueOf(s[2]),Integer.valueOf(s[3]));
-                 dictionary.put(term.getTerm(),term);
-             }
+            while ( (line = br.readLine()) != null )
+            {
+                String[] s=line.split("#");
+                Term term=new Term(s[0],Long.parseLong(s[1]),Integer.valueOf(s[2]),Integer.valueOf(s[3]));
+                dictionary.put(term.getTerm(),term);
+            }
 
 
         } catch (FileNotFoundException e) {
@@ -680,7 +680,7 @@ public class Indexer {
         }
 
 
-}
+    }
     /*
        private void save_Docs_map_in_disk() {
            FileOutputStream fos = null;
@@ -711,7 +711,7 @@ public class Indexer {
         try {
             BufferedReader br;
             if(wantToStem)
-                 br = new BufferedReader(new FileReader(new File(destination + "\\" + "docs stem")));
+                br = new BufferedReader(new FileReader(new File(destination + "\\" + "docs stem")));
             else
                 br=new BufferedReader(new FileReader(new File(destination + "\\" + "docs")));
 
@@ -765,40 +765,3 @@ public class Indexer {
 */
 
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

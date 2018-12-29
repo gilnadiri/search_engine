@@ -1,5 +1,6 @@
 package Modle;
 
+
 import javax.swing.text.html.ListView;
 import java.awt.*;
 import java.awt.List;
@@ -9,6 +10,7 @@ import java.util.*;
 public class Ranker {
     public Map<String,Documentt> documents; //information on every doc
     public Map<String,Term> dictionary;     //inverted index of terms
+    public Map<String,City> cities_index;
     public ArrayList<String> query;
     private String Posting_And_dictionary_path_in_disk;
     double avdl;
@@ -19,10 +21,10 @@ public class Ranker {
     public Ranker(String Posting_And_dictionary_path_in_disk,boolean stem) {
         this.documents = new HashMap<>();
         this.dictionary=new HashMap<>();
+        this.cities_index=new HashMap<>();
         this.Posting_And_dictionary_path_in_disk=Posting_And_dictionary_path_in_disk;
         Load_Dictionary_and_documets(stem,Posting_And_dictionary_path_in_disk);
         this.avdl=avdl();
-
     }
 
     private void Load_Dictionary_and_documets(boolean stem, String posting_and_dictionary_path_in_disk) {
@@ -87,8 +89,10 @@ public class Ranker {
     }
 
 
-    public ArrayList<Map.Entry<String,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter){//returns the docNo sorted by rank
+    public ArrayList<Map.Entry<String,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter,HashMap<String,City> cities_index){//returns the docNo sorted by rank
         this.query=query;
+        this.cities_index=cities_index;
+        HashMap<String,Double> total=new HashMap<>();
         Map<String,Double> BM25=new HashMap();
         Map<String,Double> Wij_Wiq=new HashMap();
         Map<String,Double> Wij_2=new HashMap();
@@ -98,8 +102,20 @@ public class Ranker {
             RandomAccessFile raf = null;
             try {
                 raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting", "rw");
-                if(!dictionary.containsKey(query.get(i)))
+                if(!dictionary.containsKey(query.get(i))) {
+                    //check if the word is at city tags
+                    //bring the cities index from searcher
+                    //add to finish score with grade 1
+                    if(cities_index.containsKey(query.get(i))) {
+                        //the word exist in city tag but not at text
+                        City toAdd=cities_index.get(i);
+                        HashMap<String,String> loc=toAdd.getLocation();
+                        for(Map.Entry<String,String> entry: loc.entrySet()){
+                            total.put(entry.getKey(),1.0);
+                        }
+                    }
                     continue;
+                }
                 long pointer=dictionary.get(query.get(i)).getPointerToPostings();
                 raf.seek(pointer);
                 String postiongForWord=raf.readLine();
@@ -121,25 +137,10 @@ public class Ranker {
                     double df=dictionary.get(query.get(i)).getDf();
                     double bm25=BM25(query.get(i),docsWithWord[j],documents.get(docNo).getDocLength(),df);
 
-                    double tf=Integer.valueOf(docsWithWord[j].substring(docsWithWord[j].indexOf("+")+1,docsWithWord[j].indexOf("~")));
-                    double numOfDocs=documents.size();
-                    double docLen=documents.get(docNo).getDocLength();
-                    double avgDocLen=avdl;
-                    double queryFrequency=1;
-                    double docFreq=df;
-
-
-                    //double bm25=score(tf,numOfDocs,docLen,avgDocLen,queryFrequency,docFreq);
                     if(BM25.containsKey(docNo))
                         BM25.put(docNo,BM25.get(docNo)+bm25);
                     else
                         BM25.put(docNo,bm25);
-
-                    //cossim
-                    // double wij=wij(Integer.valueOf(docsWithWord[j].substring(docsWithWord[j].indexOf("+")+1,docNo.indexOf("~"))),documents.size(),df,documents.get(docNo).Doc_max_tf);
-
-
-
 
                     //1=wij*wiq
                     double wij_wiq=Wij_Wiq(docsWithWord[j],(double)documents.get(docNo).getDocLength(),df,1);
@@ -166,13 +167,35 @@ public class Ranker {
             }
         }
         HashMap<String,Double> finalCosSim=finalCosSim(Wij_Wiq,Wij_2,Wiq_2);
-        return finalCalculate(BM25,finalCosSim,AtStart);
+        double maxbm25 = getMax(BM25);
+        nirmul(BM25,maxbm25);
+        double maxCos = getMax(finalCosSim);
+        nirmul(finalCosSim,maxCos);
+        double maxStart = getMax(AtStart);
+        nirmul(AtStart,maxStart);
+
+
+        return finalCalculate(BM25,finalCosSim,AtStart,total);
 
     }
 
-//    private double wij(int tf, int size, int df,int max_freq) {
-//        return (tf/max_freq)
-//    }
+    private void nirmul(Map<String, Double> toNormelize,double max) {
+        for(Map.Entry<String,Double> entry: toNormelize.entrySet()) {
+            String doc=entry.getKey();
+            toNormelize.put(doc,(entry.getValue()/max));
+        }
+
+
+
+    }
+    private double getMax(Map<String, Double> map) {
+        double max=0;
+        for(Map.Entry<String,Double> entry: map.entrySet()) {
+            if(max<entry.getValue())
+                max=entry.getValue();
+        }
+        return max;
+    }
 
     private HashMap<String,Double> finalCosSim(Map<String, Double> wij_wiq, Map<String, Double> wij_2, Map<String, Double> wiq_2) {
         HashMap<String,Double> ans=new HashMap<>();
@@ -185,10 +208,15 @@ public class Ranker {
         return ans;
     }
 
-    private ArrayList<Map.Entry<String,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart) {
+    private ArrayList<Map.Entry<String,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart,Map<String,Double> total) {
 
+        for(Map.Entry<String,Double> entry: bm25.entrySet()) {
+            String doc=entry.getKey();
+            double newVal=entry.getValue()*0.98+cosSim.get(doc)*0.01+atStart.get(doc)*0.01;
+            total.put(doc,newVal);
+        }
 
-        ArrayList<Map.Entry<String, Double>> list = new ArrayList<>(bm25.entrySet());
+            ArrayList<Map.Entry<String, Double>> list = new ArrayList<>(total.entrySet());
         list.sort(new Comparator<Map.Entry<String, Double>>() {
             @Override
             public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) {
@@ -210,13 +238,13 @@ public class Ranker {
     }
 
 
-    public double BM25(String word,String docNo,double docLen,double df){
+    public double BM25(String word,String AlldocNo,double docLen,double df){
 
         double k=1.2;
         double b=0.75;
         double M=documents.size();
         double CWQ=calculateWordFreqQuery(word);
-        double CWD=Double.valueOf(docNo.substring(docNo.indexOf("+")+1,docNo.indexOf("~")));//TODO לבדוק שהחיתוך טוב
+        double CWD=Double.valueOf(AlldocNo.substring(AlldocNo.indexOf("+")+1,AlldocNo.indexOf("~")));
         double mone=(k+1)*CWD;
         double mechne1=CWD;
         double mechne2= k* ( 0.25 + (b*(docLen/avdl)) );
@@ -227,17 +255,6 @@ public class Ranker {
         return leftSide*logCalculat;
     }
 
-
-    public final double score(double tf,double numberOfDocuments,double docLength,double averageDocumentLength,double queryFrequency,double documentFrequency) {
-
-        double K = 1.2d * ((1 - 0.75d) + ((0.75d * docLength) / averageDocumentLength));
-        double weight = ( ((1.2d + 1d) * tf) / (K + tf) );	//first part
-        weight = weight * ( ((8d + 1) * queryFrequency) / (8d + queryFrequency) );	//second part
-
-        // multiply the weight with idf
-        double idf = weight * Math.log10((numberOfDocuments - documentFrequency + 0.5d) / (documentFrequency + 0.5d));
-        return idf;
-    }
 
     private double calculateWordFreqQuery(String word) {
         double ans=0;
@@ -251,10 +268,13 @@ public class Ranker {
     public double Wij_Wiq(String docNo,double docLen,double df,int i){
         double fi=Double.valueOf(docNo.substring(docNo.indexOf("+")+1,docNo.indexOf("~")));
         double tfi=fi/docLen;
+        double N=documents.size();
+        double idf=Math.log(N/df)/Math.log(2);
+        double wij=tfi*idf;
         if(i==1)
-            return tfi*df;
+            return wij;
         if(i==2)
-            return Math.pow(tfi*df,2);
+            return Math.pow(wij,2);
         else
             return 1;
     }
