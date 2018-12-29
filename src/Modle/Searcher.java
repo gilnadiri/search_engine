@@ -16,14 +16,12 @@ public class Searcher {
     private Ranker ranker;
     private  HashMap<String,City> cities_index;
 
-    public Searcher (String postingindisk){
+    public Searcher (String postingindisk,boolean stem){
         this.cities_index=new HashMap<>();
         Load_cities_from_Disk(postingindisk);
-        long startTime = System.nanoTime();
-        this.ranker=new Ranker(postingindisk,false);
-        long finishTime 	= System.nanoTime();
-        double time=(finishTime - startTime)/1000000.0/1000;
-        System.out.println(time);
+        this.ranker=new Ranker(postingindisk,false,cities_index);
+
+
     }
 
     private void Load_cities_from_Disk(String posting_in_disk) {
@@ -68,7 +66,7 @@ public class Searcher {
            parsed_query.add(entry.getKey());
 
 
-       ArrayList<Map.Entry<String,Double>> results=ranker.Rank(parsed_query,exist_cities_limitation,fitToLimitation,cities_index);
+       ArrayList<Map.Entry<String,Double>> results=ranker.Rank(parsed_query,exist_cities_limitation,fitToLimitation);
        return results;
 
    }
