@@ -25,7 +25,6 @@ public class Ranker {
         this.Posting_And_dictionary_path_in_disk=Posting_And_dictionary_path_in_disk;
         Load_Dictionary_and_documets(stem,Posting_And_dictionary_path_in_disk);
         this.avdl=avdl();
-
     }
 
     private void Load_Dictionary_and_documets(boolean stem, String posting_and_dictionary_path_in_disk) {
@@ -56,12 +55,16 @@ public class Ranker {
             String line1;
             while ( (line1 = br1.readLine()) != null )
             {
-                String[] s=line.split("#");
-                String yeshooyot=s[5];
-                String[] s1 = yeshooyot.split(",");
-                ArrayList<String> yeshooyott=new ArrayList<>();
-                for(int i=0;i<s1.length;i++)
-                    yeshooyott.add(s1[i]);
+                String[] s=line1.split("#");
+                ArrayList<String> yeshooyott = new ArrayList<>();
+                if(s.length==6) {
+                    String yeshooyot = s[5];
+                    String[] s1 = yeshooyot.split(",");
+                    for (int i = 0; i < s1.length; i++)
+                        yeshooyott.add(s1[i]);
+                }
+
+
                 Documentt documett=new Documentt(s[0],Integer.valueOf(s[1]),Integer.valueOf(s[3]),s[4],Integer.valueOf(s[2]));
                 documett.setYeshooyot(yeshooyott);
                 documents.put(documett.Doc_Name,documett);

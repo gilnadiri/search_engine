@@ -36,6 +36,8 @@ public class Parse {
         }
         catch (IOException e){}
     }
+
+
     public HashMap<String,City> getCities(){
         return cities;
     }

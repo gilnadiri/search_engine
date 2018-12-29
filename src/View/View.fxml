@@ -47,12 +47,12 @@
             <Font name="Comic Sans MS" size="19.0" />
          </font>
       </Button>
-      <Button fx:id="loadDic" layoutX="334.0" layoutY="592.0" mnemonicParsing="false" onAction="#loadDic" prefHeight="61.0" prefWidth="180.0" text="Load Dictionary">
+      <Button fx:id="loadDic" layoutX="597.0" layoutY="474.0" mnemonicParsing="false" onAction="#loadDic" prefHeight="61.0" prefWidth="180.0" text="Load Dictionary">
          <font>
             <Font name="Comic Sans MS" size="19.0" />
          </font>
       </Button>
-      <Button fx:id="reset" layoutX="597.0" layoutY="476.0" mnemonicParsing="false" onAction="#reset" prefHeight="57.0" prefWidth="180.0" text="Reset!">
+      <Button fx:id="reset" layoutX="340.0" layoutY="592.0" mnemonicParsing="false" onAction="#reset" prefHeight="57.0" prefWidth="180.0" text="Reset!">
          <font>
             <Font name="Comic Sans MS" size="26.0" />
          </font>

@@ -5,17 +5,11 @@ import java.util.*;
 
 public class main {
     public static void main(String[] args) throws IOException {
-        // test1();
-
-
-        test2();
-
-
 
         Searcher searcher=new Searcher("C:\\Users\\hoday\\Desktop\\d");
         //searcher.Search_files_quries("C:\\Users\\gil nadiri\\Desktop\\dest\\queries.txt",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
 
-        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_single_query("blood-alcohol fatalities",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
+        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_single_query("piracy",false,false,new ArrayList<String>(),"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\corpus");
         ArrayList<String> judjescore=checkfromfile();
 
         relevant_i_back_from_all_the_relevant(myscores,judjescore);
@@ -112,7 +106,7 @@ public class main {
 
     private static ArrayList<String> checkfromfile() throws IOException {
         ArrayList<String> res=new ArrayList<>();
-        BufferedReader bf= new BufferedReader(new FileReader(new File("C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה" + "\\" + "1.txt")));
+        BufferedReader bf= new BufferedReader(new FileReader(new File("C:\\Users\\hoday\\Desktop\\destination" + "\\" + "1.txt")));
         for(String line; (line = bf.readLine()) != null; ) {
             if(lineisrelevant(line))
                 res.add(line.split(" ")[2]);
@@ -123,7 +117,7 @@ public class main {
 
     private static boolean lineisrelevant(String line) {
         String[] s=line.split(" ");
-        if(s[3].equals("1") && s[0].equals("358"))
+        if(s[3].equals("1") && s[0].equals("367"))
             return true;
         else return false;
     }

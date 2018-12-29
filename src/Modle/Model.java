@@ -10,6 +10,7 @@ import java.util.Map;
 public class Model {
 
     public Indexer indexer;
+    public Searcher searcher;
     public View_Model viewModel;
 
 

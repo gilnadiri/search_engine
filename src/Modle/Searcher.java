@@ -18,10 +18,7 @@ public class Searcher {
 
     public Searcher (String postingindisk){
         this.cities_index=new HashMap<>();
-
         Load_cities_from_Disk(postingindisk);
-
-
         long startTime = System.nanoTime();
         this.ranker=new Ranker(postingindisk,false);
         long finishTime 	= System.nanoTime();
