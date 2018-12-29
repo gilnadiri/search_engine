@@ -18,10 +18,11 @@ public class Ranker {
 
 
 
-    public Ranker(String Posting_And_dictionary_path_in_disk,boolean stem) {
+    public Ranker(String Posting_And_dictionary_path_in_disk,boolean stem,HashMap<String,City> cities_index) {
         this.documents = new HashMap<>();
         this.dictionary=new HashMap<>();
         this.cities_index=new HashMap<>();
+        this.cities_index=cities_index;
         this.Posting_And_dictionary_path_in_disk=Posting_And_dictionary_path_in_disk;
         Load_Dictionary_and_documets(stem,Posting_And_dictionary_path_in_disk);
         this.avdl=avdl();
@@ -78,9 +79,7 @@ public class Ranker {
         }
     }
 
-    private void Load_Dictionary(boolean stem, String posting_and_dictionary_path_in_disk) {
 
-            }
 
     private double avdl() {
         double sum=0;
@@ -91,9 +90,8 @@ public class Ranker {
     }
 
 
-    public ArrayList<Map.Entry<String,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter,HashMap<String,City> cities_index){//returns the docNo sorted by rank
+    public ArrayList<Map.Entry<String,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter){//returns the docNo sorted by rank
         this.query=query;
-        this.cities_index=cities_index;
         HashMap<String,Double> total=new HashMap<>();
         Map<String,Double> BM25=new HashMap();
         Map<String,Double> Wij_Wiq=new HashMap();
@@ -218,7 +216,7 @@ public class Ranker {
             total.put(doc,newVal);
         }
 
-            ArrayList<Map.Entry<String, Double>> list = new ArrayList<>(total.entrySet());
+        ArrayList<Map.Entry<String, Double>> list = new ArrayList<>(total.entrySet());
         list.sort(new Comparator<Map.Entry<String, Double>>() {
             @Override
             public int compare(Map.Entry<String, Double> o1, Map.Entry<String, Double> o2) {
@@ -280,12 +278,4 @@ public class Ranker {
         else
             return 1;
     }
-
-
-
-
-
-
-
-
 }

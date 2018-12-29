@@ -163,7 +163,7 @@ public class Controller {
             boolean ans=viewModel.loadDic(wantToStem, destination);
             if(!ans) {
                 alert.close();
-                showAlert("No dictionary to load");
+                showAlert("No items to load");
             }
             else {
                 alert.close();

@@ -2,6 +2,7 @@ package Modle;
 
 import ViewModel.View_Model;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,7 +21,7 @@ public class Model {
     }
 
     public ArrayList<Term> showDic() {
-        if(indexer==null)
+        if(searcher==null)
             return null;
         return indexer.showDic();
     }
@@ -41,10 +42,24 @@ public class Model {
         return indexer.numOfTerms();
     }
 
+
     public boolean loadDic(boolean wantToStem, String destination) {
-        if(indexer==null)
-            indexer=new Indexer(wantToStem,"",destination);
-        return indexer.loadDic(wantToStem,destination);
+        if(wantToStem) {
+            File docs = new File(destination + "\\" + "docs stem");
+            File dictionary = new File(destination + "\\" + "dictionary stem");
+            File cities = new File(destination + "\\" + "cities stem");
+            if (!docs.exists()||!dictionary.exists()||!cities.exists())
+                return false;
+        }
+        else{
+            File docs = new File(destination + "\\" + "docs");
+            File dictionary = new File(destination + "\\" + "dictionary");
+            File cities = new File(destination + "\\" + "cities");
+            if (!docs.exists()||!dictionary.exists()||!cities.exists())
+                return false;
+        }
+        searcher = new Searcher(destination, wantToStem);
+        return true;
     }
 
     public int numOfCities() {
