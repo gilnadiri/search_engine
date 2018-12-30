@@ -5,26 +5,31 @@ import java.util.*;
 
 public class main {
     public static void main(String[] args) throws IOException {
-        // test1();
 
 
 
-        Searcher searcher=new Searcher("C:\\Users\\gil nadiri\\Desktop\\dest",false);
-        searcher.Search_files_quries("C:\\Users\\gil nadiri\\Desktop\\dest\\queries.txt",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
-
-        ArrayList<Map.Entry<String,Double>> myscores=searcher.Search_single_query("piracy",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
-        ArrayList<String> judjescore=checkfromfile();
-
-        relevant_i_back_from_all_the_relevant(myscores,judjescore);
+        test3();
+        //test4();
+        //searcher.Search_files_quries("C:\\Users\\gil nadiri\\Desktop\\dest\\queries.txt",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
+       // ArrayList<Map.Entry<Documentt,Double>> myscores=searcher.Search_single_query("Falkland petroleum exploration",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
+        //ArrayList<String> judjescore=checkfromfile();
+        //relevant_i_back_from_all_the_relevant(myscores,judjescore);
 
     }
 
 
 
-    private static void relevant_i_back_from_all_the_relevant(ArrayList<Map.Entry<String, Double>> myscores, ArrayList<String> judjescore) {
+    private static void test3() {
+        Searcher searcher=new Searcher("C:\\Users\\gil nadiri\\Desktop\\dest",false);
+        searcher.Search_files_quries("C:\\Users\\gil nadiri\\Desktop\\dest\\queries.txt",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus","C:\\Users\\gil nadiri\\Desktop\\results");
+        int i=0;
+    }
+
+
+    private static void relevant_i_back_from_all_the_relevant(ArrayList<Map.Entry<Documentt, Double>> myscores, ArrayList<String> judjescore) {
         ArrayList<String> my=new ArrayList<>();
         for(int i=0;i<myscores.size();i++)
-            my.add(myscores.get(i).getKey());
+            my.add(myscores.get(i).getKey().Doc_Name);
         int ans=0;
         for(int i=0;i<my.size();i++) {
             for (int j = 0; j < judjescore.size(); j++) {
@@ -50,7 +55,7 @@ public class main {
 
     private static boolean lineisrelevant(String line) {
         String[] s=line.split(" ");
-        if(s[3].equals("1") && s[0].equals("367"))
+        if(s[3].equals("1") && s[0].equals("351"))
             return true;
         else return false;
     }

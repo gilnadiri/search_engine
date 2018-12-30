@@ -10,7 +10,21 @@ public class Documentt implements Serializable {
     public int Doc_uniqe_words;
     private String Doc_City;
     private ArrayList<String> Yeshooyot;  //the top 5 yeshoohoyot in the doc-from the most stronget to less stronger
+    private String header;
 
+    public String getHeader() {
+        return header;
+    }
+
+    public void setHeader(String header) {
+        this.header = header;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        Documentt doc1=(Documentt) obj;
+        return this.Doc_Name.equals(doc1.Doc_Name);
+    }
 
     @Override
     public String toString() {
@@ -18,7 +32,7 @@ public class Documentt implements Serializable {
         for(int i=0;i<Yeshooyot.size();i++)
             yeshooyot=yeshooyot+Yeshooyot.get(i)+",";
 
-        return Doc_Name+"#"+Doc_max_tf+"#"+DocLength+"#"+Doc_uniqe_words+"#"+Doc_City+"#"+yeshooyot;
+        return Doc_Name+"#"+Doc_max_tf+"#"+DocLength+"#"+Doc_uniqe_words+"#"+Doc_City+"#"+header+"#"+yeshooyot;
 
     }
 
@@ -28,7 +42,8 @@ public class Documentt implements Serializable {
         Doc_uniqe_words = doc_uniqe_words;
         Doc_City = doc_City;
         DocLength = docLength;
-        //Yeshooyot=new ArrayList<>();
+        Yeshooyot=new ArrayList<>();
+        header="-1";
 
     }
 

@@ -58,8 +58,8 @@ public class Ranker {
             {
                 String[] s=line1.split("#");
                 ArrayList<String> yeshooyott = new ArrayList<>();
-                if(s.length==6) {
-                    String yeshooyot = s[5];
+                if(s.length==7) {
+                    String yeshooyot = s[6];
                     String[] s1 = yeshooyot.split(",");
                     for (int i = 0; i < s1.length; i++)
                         yeshooyott.add(s1[i]);
@@ -67,6 +67,7 @@ public class Ranker {
 
 
                 Documentt documett=new Documentt(s[0],Integer.valueOf(s[1]),Integer.valueOf(s[3]),s[4],Integer.valueOf(s[2]));
+                documett.setHeader(s[5]);
                 documett.setYeshooyot(yeshooyott);
                 documents.put(documett.Doc_Name,documett);
             }
@@ -216,7 +217,7 @@ public class Ranker {
             total.put(documents.get(doc),newVal);
         }
 
-            ArrayList<Map.Entry<Documentt, Double>> list = new ArrayList<>(total.entrySet());
+        ArrayList<Map.Entry<Documentt, Double>> list = new ArrayList<>(total.entrySet());
         list.sort(new Comparator<Map.Entry<Documentt, Double>>() {
             @Override
             public int compare(Map.Entry<Documentt, Double> o1, Map.Entry<Documentt, Double> o2) {
@@ -225,10 +226,9 @@ public class Ranker {
         });
         ArrayList<Map.Entry<Documentt, Double>> res = new ArrayList<>();
         for (int i = 0; i < 50 && i < list.size(); i++) {
-             res.add(list.get(i));
+            res.add(list.get(i));
         }
-            for (int i = 0; i < res.size(); i++)
-            System.out.println(res.get(i).getKey() + "---->" + res.get(i).getValue());
+
         return res;
 
     }
@@ -278,6 +278,23 @@ public class Ranker {
             return Math.pow(wij,2);
         else
             return 1;
+    }
+
+    public ArrayList<Term> showDic() {
+        if(dictionary.size()==0)
+            return null;
+
+        ArrayList<Term> list = new ArrayList<>(dictionary.values());
+        list.sort(new Comparator<Term>() {
+            @Override
+            public int compare(Term o1, Term o2) {
+                String term1 = o1.getTerm();
+                String term2 = o2.getTerm();
+                return term1.compareToIgnoreCase(term2);
+            }
+        });
+
+        return list;
     }
 
 
