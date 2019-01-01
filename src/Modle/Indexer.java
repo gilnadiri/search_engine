@@ -718,12 +718,15 @@ public class Indexer {
             String line;
             while ( (line = br.readLine()) != null )
             {
+                ArrayList<String> yeshooyott = new ArrayList<>();
                 String[] s=line.split("#");
-                String yeshooyot=s[5];
-                String[] s1 = yeshooyot.split(",");
-                ArrayList<String> yeshooyott=new ArrayList<>();
-                for(int i=0;i<s1.length;i++)
-                    yeshooyott.add(s1[i]);
+                if(s.length==6) {
+                    String yeshooyot = s[5];
+                    String[] s1 = yeshooyot.split(",");
+
+                    for (int i = 0; i < s1.length; i++)
+                        yeshooyott.add(s1[i]);
+                }
                 Documentt documett=new Documentt(s[0],Integer.valueOf(s[1]),Integer.valueOf(s[3]),s[4],Integer.valueOf(s[2]));
                 documett.setYeshooyot(yeshooyott);
                 documents.put(documett.Doc_Name,documett);

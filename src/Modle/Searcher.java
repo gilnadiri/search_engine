@@ -27,48 +27,46 @@ public class Searcher {
 
 
 
-
-
-    public ArrayList<Map.Entry<String,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment , ArrayList<String> cities_limitation, String corpuspath )
-    {
-        boolean exist_cities_limitation=false;
-        if(cities_limitation.size()>0)
-            exist_cities_limitation=true;
-        HashSet<String> fitToLimitation=new HashSet<>();
-        if(exist_cities_limitation)
+    public ArrayList<Map.Entry<Documentt,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment , ArrayList<String> cities_limitation, String corpuspath )
+   {
+       boolean exist_cities_limitation=false;
+       if(cities_limitation.size()>0)
+           exist_cities_limitation=true;
+       HashSet<String> fitToLimitation=new HashSet<>();
+       if(exist_cities_limitation)
             fitToLimitation=citiesLimitation(cities_limitation);
 
-        Map<String,TokenInfo> parsedQuery=new Parse(corpuspath).getParsing(query,"query",stem);
-        ArrayList<String> parsed_query=new ArrayList<>();
-        for(Map.Entry<String,TokenInfo> entry: parsedQuery.entrySet())
-            parsed_query.add(entry.getKey());
+       Map<String,TokenInfo> parsedQuery=new Parse(corpuspath).getParsing(query,"query",stem);
+       ArrayList<String> parsed_query=new ArrayList<>();
+       for(Map.Entry<String,TokenInfo> entry: parsedQuery.entrySet())
+           parsed_query.add(entry.getKey());
 
 
-        ArrayList<Map.Entry<String,Double>> results=ranker.Rank(parsed_query,exist_cities_limitation,fitToLimitation);
-        return results;
+       ArrayList<Map.Entry<Documentt,Double>> results=ranker.Rank(parsed_query,exist_cities_limitation,fitToLimitation);
+       return results;
 
-    }
+   }
 
-    public LinkedHashMap<String, ArrayList<Map.Entry<String,Double>> > Search_files_quries(String query_file_path,boolean stem,boolean semantic,ArrayList<String> cities_limitation,String corpuspath)
-    {
-        LinkedHashMap<String,ArrayList<Map.Entry<String,Double>>> res=new LinkedHashMap<>();
+   public LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > Search_files_quries(String query_file_path,boolean stem,boolean semantic,ArrayList<String> cities_limitation,String corpuspath)
+   {
+       LinkedHashMap<String,ArrayList<Map.Entry<Documentt,Double>>> res=new LinkedHashMap<>();
 
 
-        ArrayList<String> quries=extract_quries_from_file(query_file_path);
+       ArrayList<String> quries=extract_quries_from_file(query_file_path);
 
-        for(int i=0;i<quries.size();i++)
-        {
-            String[]s=quries.get(i).split("~");
-            String id_query=s[0];
-            String query=s[1];
-            ArrayList<Map.Entry<String,Double>> rank_for_query=Search_single_query(query,stem,semantic,cities_limitation,corpuspath);
-            res.put(id_query,rank_for_query);
-        }
+       for(int i=0;i<quries.size();i++)
+       {
+           String[]s=quries.get(i).split("~");
+           String id_query=s[0];
+           String query=s[1];
+           ArrayList<Map.Entry<Documentt,Double>> rank_for_query=Search_single_query(query,stem,semantic,cities_limitation,corpuspath);
+           res.put(id_query,rank_for_query);
+       }
 
         return res;
 
 
-    }
+   }
 
     private ArrayList<String> extract_quries_from_file(String queries_file) {
         ArrayList<String> queries=new ArrayList<>();
@@ -125,9 +123,9 @@ public class Searcher {
     }
 
     private String extract_id_query(String line_number) {
-        String[] id=line_number.split(":");
-        id[1]=id[1].replace(" ","");
-        return id[1];
+          String[] id=line_number.split(":");
+          id[1]=id[1].replace(" ","");
+          return id[1];
     }
 
 
@@ -135,8 +133,8 @@ public class Searcher {
         HashSet<String> fitToLimitation=new HashSet<>();
         for(String city : cities_limitation){
             HashMap<String,String> alldocs_in_the_city=cities_index.get(city).getLocation();
-            for(Map.Entry<String,String> entry : alldocs_in_the_city.entrySet())
-                fitToLimitation.add(entry.getKey());
+             for(Map.Entry<String,String> entry : alldocs_in_the_city.entrySet())
+                 fitToLimitation.add(entry.getKey());
         }
         return fitToLimitation;
 

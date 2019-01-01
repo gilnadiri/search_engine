@@ -32,6 +32,8 @@ public class Documentt implements Serializable {
 
     }
 
+
+
     public int getDocLength() {
         return DocLength;
     }
