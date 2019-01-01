@@ -132,6 +132,7 @@ public class Searcher {
             String[] s = quries.get(i).split("~");
             String id_query = s[0];
             String query = s[1];
+
             ArrayList<Map.Entry<Documentt, Double>> rank_for_query = Search_single_query(query, stem, semantic, cities_limitation, corpuspath,destanation_of_results_file,false);
             res.put(id_query, rank_for_query);
         }
@@ -183,7 +184,8 @@ public class Searcher {
                 String id_query=extract_id_query(line_number);
                 String s3[]=s2[1].split("<desc>");
                 String title=s3[0];
-                queries.add(id_query+"~"+title);
+                String description=descrition(s3[1]);
+                queries.add(id_query+"~"+title+description);
             }
 
 

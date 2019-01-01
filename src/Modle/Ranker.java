@@ -103,12 +103,19 @@ public class Ranker {
         for(int i=0;i<query.size();i++) {
             RandomAccessFile raf = null;
             try {
+                String word=query.get(i);
+                if(dictionary.containsKey(word.toUpperCase())){
+                    word=word.toUpperCase();
+                }
+                else if(dictionary.containsKey(word.toLowerCase())){
+                    word=word.toLowerCase();
+                }
                 raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting", "rw");
-                if(!dictionary.containsKey(query.get(i))) {
+                if(!dictionary.containsKey(query.get(i).toUpperCase())&&!dictionary.containsKey(query.get(i).toLowerCase())) {
                     //check if the word is at city tags
                     //bring the cities index from searcher
                     //add to finish score with grade 1
-                    if(cities_index.containsKey(query.get(i))) {
+                    if(cities_index.containsKey(query.get(i).toUpperCase())) {//cities index always have upper case
                         //the word exist in city tag but not at text
                         City toAdd=cities_index.get(i);
                         HashMap<String,String> loc=toAdd.getLocation();
@@ -118,7 +125,7 @@ public class Ranker {
                     }
                     continue;
                 }
-                long pointer=dictionary.get(query.get(i)).getPointerToPostings();
+                long pointer=dictionary.get(word).getPointerToPostings();
                 raf.seek(pointer);
                 String postiongForWord=raf.readLine();
                 String [] docsWithWord=spliteDocNo(postiongForWord);
@@ -144,8 +151,13 @@ public class Ranker {
                         AtStart.put(docNo,atStart);
 
                     //bm25
-                    double df=dictionary.get(query.get(i)).getDf();
-                    double bm25=BM25(query.get(i),docsWithWord[j],documents.get(docNo).getDocLength(),df);
+                    double df=dictionary.get(word).getDf();
+                    double bm25=BM25(word,docsWithWord[j],documents.get(docNo).getDocLength(),df);
+                    ArrayList<String> entities=documents.get(docNo).getYeshooyot();
+                    for (int k = 0; k < entities.size(); k++) {
+                        if(entities.get(k).equals(word.toUpperCase()))
+                            bm25+=1;
+                    }
 
                     if(BM25.containsKey(docNo))
                         BM25.put(docNo,BM25.get(docNo)+bm25);
@@ -241,7 +253,7 @@ public class Ranker {
 
         for(Map.Entry<String,Double> entry: bm25.entrySet()) {
             String doc=entry.getKey();
-            double newVal=(entry.getValue()*0.97)+(cosSim.get(doc)*0.01)+(atStart.get(doc)*0.01)+(atHeader.get(doc)*0.01);
+            double newVal=(entry.getValue()*1)+(cosSim.get(doc)*0)+(atStart.get(doc)*0)+(atHeader.get(doc)*0);
             total.put(documents.get(doc),newVal);
         }
 
@@ -269,14 +281,14 @@ public class Ranker {
 
     public double BM25(String word,String AlldocNo,double docLen,double df){
 
-        double k=1.2;
-        double b=0.75;
+        double k=1.3;
+        double b=0.5;
         double M=documents.size();
-        double CWQ=calculateWordFreqQuery(word);
+        double CWQ=1;//calculateWordFreqQuery(word);//1?
         double CWD=Double.valueOf(AlldocNo.substring(AlldocNo.indexOf("+")+1,AlldocNo.indexOf("~")));
         double mone=(k+1)*CWD;
         double mechne1=CWD;
-        double mechne2= k* ( 0.25 + (b*(docLen/avdl)) );
+        double mechne2= k* ( 0.5 + (b*(docLen/avdl)) );
         double mechne=mechne1+mechne2;
         double logMone=M+1;
         double logCalculat=(Math.log10(logMone/df));
@@ -288,7 +300,7 @@ public class Ranker {
     private double calculateWordFreqQuery(String word) {
         double ans=0;
         for(int i=0;i<query.size();i++)
-            if(query.get(i).equals(word))
+            if(query.get(i).toUpperCase().equals(word)||query.get(i).toLowerCase().equals(word))
                 ans++;
         return ans;
     }
