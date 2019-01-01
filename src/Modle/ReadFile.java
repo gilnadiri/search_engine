@@ -72,6 +72,7 @@ public class ReadFile {
            return "-1";
        String[] s2=s1[1].split("</TI>");
        String header=s2[0];
+       header=header.replace("\n","");
        return header;
 
     }
@@ -102,6 +103,8 @@ public class ReadFile {
             String[] s2=s1[1].split("</DOCNO>");
             if(s2[0].charAt(0)==' ') s2[0]=s2[0].substring(1);
             if(s2[0].charAt(s2[0].length()-1)==' ') s2[0]=s2[0].substring(0,s2[0].length()-1);
+
+
 
             Documentt d=new Documentt(s2[0],-1,-1,"",-1);
 

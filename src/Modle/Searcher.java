@@ -1,9 +1,6 @@
 package Modle;
 
-import javafx.scene.Parent;
-
 import java.io.*;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
 import java.nio.file.Files;
@@ -36,7 +33,7 @@ public class Searcher {
     }
 
 
-    public ArrayList<Map.Entry<Documentt, Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment, ArrayList<String> cities_limitation, String corpuspath) {
+    public ArrayList<Map.Entry<Documentt, Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment, ArrayList<String> cities_limitation, String corpuspath,String destanation_of_results_file,boolean original_single) {
 
         boolean exist_cities_limitation = false;
         if (cities_limitation.size() > 0)
@@ -56,7 +53,31 @@ public class Searcher {
                 parsed_query=semantic(parsed_query);
 
         ArrayList<Map.Entry<Documentt, Double>> results = ranker.Rank(parsed_query, exist_cities_limitation, fitToLimitation);
+        if(original_single)
+            save_results_single_query_to_disk(destanation_of_results_file,results);
         return results;
+
+    }
+
+    private void save_results_single_query_to_disk(String destanation_of_results_file,ArrayList<Map.Entry<Documentt,Double>> results) {
+        FileWriter fos = null;
+
+        try {
+            fos = new FileWriter(destanation_of_results_file + "\\" + "results.txt");
+            PrintWriter pw = new PrintWriter(fos);
+
+           for(int i=0;i<results.size();i++)
+           {
+               String line="111" + " 0 " + results.get(i).getKey().Doc_Name +  " 1 42.38 mt" + "\n";
+               pw.write(line);
+           }
+
+            pw.close();
+            fos.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
 
     }
 
@@ -69,19 +90,13 @@ public class Searcher {
 
                 try {
                     url = new URL("https://api.datamuse.com/words?ml=" + word);
-
                     URLConnection urlc = null;
-
                     urlc = url.openConnection();
-
                     urlc.setDoOutput(true);
                     urlc.setAllowUserInteraction(false);
-
                     BufferedReader br = new BufferedReader(new InputStreamReader(urlc.getInputStream()));
                     String curLine = null;
-
                     curLine = br.readLine();
-
                     if (curLine != null && !curLine.equals("")) {
                         String[] firstLineArr = curLine.split("\"word\":\"");
                         for (String s : firstLineArr) {
@@ -98,14 +113,11 @@ public class Searcher {
                             }
                         }
                     }
-
-
                 } catch (IOException e) {
                 }
             }
                     for (String sema : semantic_words)
                         original_query.add(sema);
-
             return original_query;
         }
 
@@ -120,17 +132,17 @@ public class Searcher {
             String[] s = quries.get(i).split("~");
             String id_query = s[0];
             String query = s[1];
-            ArrayList<Map.Entry<Documentt, Double>> rank_for_query = Search_single_query(query, stem, semantic, cities_limitation, corpuspath);
+            ArrayList<Map.Entry<Documentt, Double>> rank_for_query = Search_single_query(query, stem, semantic, cities_limitation, corpuspath,destanation_of_results_file,false);
             res.put(id_query, rank_for_query);
         }
 
-        write_Results_TO_Disk(res, destanation_of_results_file);
+        write_Results_file_quries_TO_Disk(res, destanation_of_results_file);
         return res;
 
 
     }
 
-    private void write_Results_TO_Disk(LinkedHashMap<String, ArrayList<Map.Entry<Documentt, Double>>> res, String dest_of_result_file) {
+    private void write_Results_file_quries_TO_Disk(LinkedHashMap<String, ArrayList<Map.Entry<Documentt, Double>>> res, String dest_of_result_file) {
 
         FileWriter fos = null;
 

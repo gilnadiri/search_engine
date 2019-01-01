@@ -22,6 +22,7 @@ public class main {
     private static void test3() {
         Searcher searcher=new Searcher("C:\\Users\\gil nadiri\\Desktop\\dest",false);
         searcher.Search_files_quries("C:\\Users\\gil nadiri\\Desktop\\dest\\queries.txt",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus","C:\\Users\\gil nadiri\\Desktop\\results");
+        //searcher.Search_single_query("Falkland petroleum exploration",false,false,new ArrayList<String>(),"C:\\\\Users\\\\gil nadiri\\\\Desktop\\\\אחזור עבודה\\\\corpus","C:\\\\Users\\\\gil nadiri\\\\Desktop\\\\results",true);
         int i=0;
     }
 

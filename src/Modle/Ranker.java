@@ -1,6 +1,5 @@
 package Modle;
 
-
 import javax.swing.text.html.ListView;
 import java.awt.*;
 import java.awt.List;
@@ -99,6 +98,8 @@ public class Ranker {
         Map<String,Double> Wij_2=new HashMap();
         Map<String,Double> Wiq_2=new HashMap();
         Map<String,Double> AtStart=new HashMap();
+        Map<String,Double> AtHeader=new HashMap();
+
         for(int i=0;i<query.size();i++) {
             RandomAccessFile raf = null;
             try {
@@ -127,6 +128,14 @@ public class Ranker {
                         if (!docsFilter.contains(docNo))
                             continue;
                     }
+
+                    //atHeader
+                    double atHeader=existInHeader(docNo,query.get(i));
+                    if(AtHeader.containsKey(docNo))
+                        AtHeader.put(docNo,AtHeader.get(docNo)+atHeader);
+                    else
+                        AtHeader.put(docNo,atHeader);
+
                     //atStart
                     double atStart=Double.valueOf(docsWithWord[j].substring(docsWithWord[j].indexOf("~")+1,docsWithWord[j].length()));
                     if(AtStart.containsKey(docNo))
@@ -174,9 +183,10 @@ public class Ranker {
         nirmul(finalCosSim,maxCos);
         double maxStart = getMax(AtStart);
         nirmul(AtStart,maxStart);
+        nirmul(AtHeader,query.size());
 
 
-        return finalCalculate(BM25,finalCosSim,AtStart,total);
+        return finalCalculate(BM25,finalCosSim,AtStart,AtHeader,total);
 
     }
 
@@ -198,6 +208,24 @@ public class Ranker {
         return max;
     }
 
+
+
+    private double existInHeader(String docNo, String queryWord) {
+        String header=documents.get(docNo).getHeader();
+        if(header.equals("-1"))
+            return (double)0;
+        String [] headerByWords=header.split(" ");
+        String wordFromQuery=queryWord.toUpperCase();
+        for (int i=0;i<headerByWords.length;i++){
+            String wordFromHeader=headerByWords[i].toUpperCase();
+            if(wordFromHeader.equals(wordFromQuery))
+                return (double)1;
+        }
+        return (double)0;
+
+
+    }
+
     private HashMap<String,Double> finalCosSim(Map<String, Double> wij_wiq, Map<String, Double> wij_2, Map<String, Double> wiq_2) {
         HashMap<String,Double> ans=new HashMap<>();
         for(Map.Entry<String,Double> entry: wij_wiq.entrySet()){
@@ -209,11 +237,11 @@ public class Ranker {
         return ans;
     }
 
-    private ArrayList<Map.Entry<Documentt,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart,Map<Documentt,Double> total) {
+    private ArrayList<Map.Entry<Documentt,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart,Map<String,Double> atHeader,Map<Documentt,Double> total) {
 
         for(Map.Entry<String,Double> entry: bm25.entrySet()) {
             String doc=entry.getKey();
-            double newVal=entry.getValue()*0.98+cosSim.get(doc)*0.01+atStart.get(doc)*0.01;
+            double newVal=(entry.getValue()*0.97)+(cosSim.get(doc)*0.01)+(atStart.get(doc)*0.01)+(atHeader.get(doc)*0.01);
             total.put(documents.get(doc),newVal);
         }
 
