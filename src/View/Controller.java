@@ -84,7 +84,7 @@ public class Controller {
         String corpus_path=this.corpus_path.getText();
         String destination=this.posting_destanation_path.getText();
         if(corpus_path.equals("")|| destination.equals(""))
-                 showAlert("please enter corpus path and Posting & Dictionary Destination");
+            showAlert("please enter corpus path and Posting & Dictionary Destination");
         else {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setContentText("Just a few minutes, We are working on it....");
@@ -119,7 +119,7 @@ public class Controller {
         String queryFile=queriesFile.getText();
         String destQuery=resultPath.getText();
         if(destQuery.equals("")) {
-            showAlert("Please choose directory where the results will save.");
+            showAlert("Please choose directory where the results will be saved.");
             return;
         }
         if((!single.equals(""))&&(!queryFile.equals(""))) {
@@ -140,12 +140,119 @@ public class Controller {
         }
 
         if(!single.equals("")){
-            ArrayList<Map.Entry<Documentt,Double>> ansSingle=viewModel.Search_single_query(single,wantToStem,semantic,cities_limitation,corpus);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("Just a few minutes, We are working on it....");
+            alert.show();
+            ArrayList<Map.Entry<Documentt,Double>> ansSingle=viewModel.Search_single_query(single,wantToStem,semantic,cities_limitation,corpus,destQuery);
+            alert.close();
             openResultsForSingle(ansSingle);
         }
         else if(!queryFile.equals("")){
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setContentText("Just a few minutes, We are working on it....");
+            alert.show();
             LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > ansFile=viewModel.Search_files_quries(queryFile,wantToStem,semantic,cities_limitation,corpus,destQuery);
-            }
+            alert.close();
+            openResultsForMulti(ansFile);
+        }
+    }
+
+    private void openResultsForMulti(LinkedHashMap<String, ArrayList<Map.Entry<Documentt, Double>>> ansFile) {
+
+        TableView<resToShow> table = new TableView<resToShow>();
+        final ObservableList<resToShow> data =FXCollections.observableArrayList();
+
+        for (Map.Entry<String, ArrayList<Map.Entry<Documentt, Double>>> entry1 : ansFile.entrySet()) {
+            String queryId = entry1.getKey();
+            ArrayList<Map.Entry<Documentt, Double>> docs_for_query = entry1.getValue();
+            for (Map.Entry<Documentt, Double> line : docs_for_query) {
+                Documentt d=line.getKey();
+                String entities="";
+                String adding="";
+                for(int i=0;i<d.getYeshooyot().size();i++){
+                    String toAdd=d.getYeshooyot().get(i);
+                    String [] splited=toAdd.split("[+]");
+                    adding="The entity: "+splited[0]+", The score: "+splited[1]+"\n";
+                    entities+=adding;
+                }
+                data.add(new resToShow(line.getKey().Doc_Name, queryId,entities));
+
+            }//for single
+        }  //for all
+
+
+
+        Stage stage=new Stage();
+        Scene scene = new Scene(new Group());
+        stage.setTitle("Results");
+        stage.setWidth(700);
+        stage.setHeight(700);
+
+        final javafx.scene.control.Label label = new Label("Results");
+        label.setFont(new Font("Arial", 20));
+
+        table.setEditable(true);
+
+        TableColumn firstNameCol = new TableColumn("Query Id");
+        firstNameCol.setMinWidth(130);
+        firstNameCol.setCellValueFactory(
+                new PropertyValueFactory<resToShow, String>("queryId"));
+
+        TableColumn secondNameCol = new TableColumn("Doc Id");
+        secondNameCol.setMinWidth(130);
+        secondNameCol.setCellValueFactory(
+                new PropertyValueFactory<resToShow, String>("docNo"));
+
+        TableColumn actionCol = new TableColumn("Entities");
+        actionCol.setMinWidth(130);
+        actionCol.setCellValueFactory(new PropertyValueFactory<>("DUMMY"));
+
+
+        Callback<TableColumn<resToShow, String>, TableCell<resToShow, String>> cellFactory
+                = //
+                new Callback<TableColumn<resToShow, String>, TableCell<resToShow, String>>() {
+                    @Override
+                    public TableCell call(final TableColumn<resToShow, String> param) {
+                        final TableCell<resToShow, String> cell = new TableCell<resToShow, String>() {
+
+                            final Button btn = new Button("Entities");
+
+
+                            @Override
+                            public void updateItem(String item, boolean empty) {
+                                super.updateItem(item, empty);
+                                if (empty) {
+                                    setGraphic(null);
+                                    setText(null);
+                                } else {
+                                    btn.setOnAction(event -> {
+                                        resToShow res = getTableView().getItems().get(getIndex());
+                                        showAlert(res.getEntities());
+
+                                    });
+                                    setGraphic(btn);
+                                    setText(null);
+                                }
+                            }
+                        };
+                        return cell;
+                    }
+                };
+        actionCol.setCellFactory(cellFactory);
+
+        table.setItems(data);
+        table.getColumns().addAll(firstNameCol,secondNameCol,actionCol);
+
+        final VBox vbox = new VBox();
+        vbox.setSpacing(5);
+        vbox.setPadding(new Insets(10, 0, 0, 10));
+        vbox.getChildren().addAll(label, table);
+
+        ((Group) scene.getRoot()).getChildren().addAll(vbox);
+
+        stage.setScene(scene);
+        stage.show();
+
     }
 
     private void openResultsForSingle(ArrayList<Map.Entry<Documentt, Double>> ansSingle) {
@@ -165,7 +272,6 @@ public class Controller {
             }
             data.add(new resToShow(line.getKey().Doc_Name, "1",entities));
         }
-
 
         Stage stage=new Stage();
         Scene scene = new Scene(new Group());
@@ -239,7 +345,7 @@ public class Controller {
 
     }
 
-   private boolean hasDigit(String toAdd) {
+    private boolean hasDigit(String toAdd) {
         for(int i=0;i<toAdd.length();i++){
             if(Character.isDigit(toAdd.charAt(i)))
                 return true;
@@ -274,9 +380,9 @@ public class Controller {
     }
 
     public void browseQuery(){
-        final DirectoryChooser directoryChooser = new DirectoryChooser();
+        final FileChooser fileChooser = new FileChooser();
 
-        File dir = directoryChooser.showDialog(primaryStage);
+        File dir = fileChooser.showOpenDialog(primaryStage);
         if (dir != null) {
             queriesFile.setText(dir.getAbsolutePath());
         } else {
@@ -287,13 +393,13 @@ public class Controller {
     public void browsePath(){
         final DirectoryChooser directoryChooser = new DirectoryChooser();
 
-            File dir = directoryChooser.showDialog(primaryStage);
-            if (dir != null) {
-                    corpus_path.setText(dir.getAbsolutePath());
-            } else {
-                corpus_path.setText("");
-             }
+        File dir = directoryChooser.showDialog(primaryStage);
+        if (dir != null) {
+            corpus_path.setText(dir.getAbsolutePath());
+        } else {
+            corpus_path.setText("");
         }
+    }
 
     public void folderDialog(){
         final DirectoryChooser directoryChooser = new DirectoryChooser();
@@ -326,7 +432,7 @@ public class Controller {
 
     public void loadDic(){
         if(loadFirst==false) {
-            showAlert("The previous dictionary is override");
+            showAlert("The previous dictionary will be replace with a new one.");
         }
         else loadFirst=false;
 

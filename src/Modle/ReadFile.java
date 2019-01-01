@@ -67,13 +67,13 @@ public class ReadFile {
     }
 
     private String extract_header(String s) {
-        String[] s1=s.split("<TI>");
-        if(s1.length==1)
-            return "-1";
-        String[] s2=s1[1].split("</TI>");
-        String header=s2[0];
-        header=header.replace("\n","");
-        return header;
+       String[] s1=s.split("<TI>");
+       if(s1.length==1)
+           return "-1";
+       String[] s2=s1[1].split("</TI>");
+       String header=s2[0];
+       header=header.replace("\n","");
+       return header;
 
     }
 
@@ -109,8 +109,8 @@ public class ReadFile {
             Documentt d=new Documentt(s2[0],-1,-1,"",-1);
 
 
-            String header=extract_header(s2[1]);
-            d.setHeader(header);
+           String header=extract_header(s2[1]);
+           d.setHeader(header);
             String []text=s2[1].split("<TEXT>\n");
             if(text.length<2)
                 continue;

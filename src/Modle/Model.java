@@ -36,13 +36,7 @@ public class Model {
         return ans;
     }
 
-    public HashSet<String> getCities(String dest){/////////////////////
-return null;
-    }
-
     public ArrayList<Term> showDic() {
-        if(searcher==null)
-            return null;
         return searcher.showDic();
     }
 
@@ -92,8 +86,8 @@ return null;
         return indexer.getLanguages();
     }
 
-    public ArrayList<Map.Entry<Documentt,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment, ArrayList<String> cities_limitation, String corpuspath) {
-        return searcher.Search_single_query(query,stem,semantic_treatment,cities_limitation,corpuspath);
+    public ArrayList<Map.Entry<Documentt,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment, ArrayList<String> cities_limitation, String corpuspath,String destQuery) {
+        return searcher.Search_single_query(query,stem,semantic_treatment,cities_limitation,corpuspath,destQuery,true);
     }
 
 
