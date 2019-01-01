@@ -41,6 +41,7 @@ public class Indexer {
             ReadFile corpus = new ReadFile(CorpusPath);
             //initiate the city index by tags
             cities_index=corpus.readAllCities(CorpusPath,languages);
+            write_languges_to_disk();
             parser.setCities(cities_index);
 
             File Main = new File(CorpusPath);
@@ -87,7 +88,6 @@ public class Indexer {
         catch (IOException e)
         {e.printStackTrace();}
     }
-
 
 
 
@@ -505,7 +505,29 @@ public class Indexer {
 
 
 
+    private void write_languges_to_disk() {
+        FileWriter fos = null;
+        try {
+            fos = new FileWriter(Posting_And_dictionary_path_in_disk + "\\" +"langueges" );
+            PrintWriter pw = new PrintWriter(fos);
+            String line;
+            for(String languge: languages) {
+                line = languge;
+                pw.println(line);
+            }
+            pw.close();
+            fos.close();
 
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+
+
+    }
 
     private void save_cities_index_in_disk() {
         FileOutputStream fos = null;
@@ -720,8 +742,8 @@ public class Indexer {
             {
                 ArrayList<String> yeshooyott = new ArrayList<>();
                 String[] s=line.split("#");
-                if(s.length==6) {
-                    String yeshooyot = s[5];
+                if(s.length==7) {
+                    String yeshooyot = s[6];
                     String[] s1 = yeshooyot.split(",");
 
                     for (int i = 0; i < s1.length; i++)
@@ -729,6 +751,7 @@ public class Indexer {
                 }
                 Documentt documett=new Documentt(s[0],Integer.valueOf(s[1]),Integer.valueOf(s[3]),s[4],Integer.valueOf(s[2]));
                 documett.setYeshooyot(yeshooyott);
+                documett.setHeader(s[5]);
                 documents.put(documett.Doc_Name,documett);
             }
 

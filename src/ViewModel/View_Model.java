@@ -1,12 +1,11 @@
 package ViewModel;
 
+import Modle.Documentt;
 import Modle.Model;
 import Modle.Term;
 
 import javax.swing.text.View;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class View_Model {
 
@@ -25,12 +24,30 @@ public class View_Model {
         return model.showDic();
     }
 
+    public ArrayList<Map.Entry<Documentt,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment , ArrayList<String> cities_limitation, String corpuspath ){
+        return model.Search_single_query(query,stem,semantic_treatment,cities_limitation,corpuspath);
+    }
+
+    public LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > Search_files_quries(String query_file_path, boolean stem, boolean semantic, ArrayList<String> cities_limitation, String corpuspath,String destQuery){
+        return model.Search_files_quries(query_file_path,stem,semantic,cities_limitation,corpuspath,destQuery);
+    }
+
+
+
     public void reset(String destination) {
         model.reset(destination);
     }
 
     public boolean loadDic(boolean wantToStem, String destination) {
         return model.loadDic(wantToStem,destination);
+    }
+
+    public HashSet<String> getLen(String dest){
+        return model.getLeng(dest);
+    }
+
+    public ArrayList<String> getCitie(){
+        return model.getCitie();
     }
 
     public int numOfDocs(){

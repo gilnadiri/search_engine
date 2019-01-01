@@ -66,6 +66,17 @@ public class ReadFile {
         return allcities;
     }
 
+    private String extract_header(String s) {
+        String[] s1=s.split("<TI>");
+        if(s1.length==1)
+            return "-1";
+        String[] s2=s1[1].split("</TI>");
+        String header=s2[0];
+        header=header.replace("\n","");
+        return header;
+
+    }
+
     private String add_langues(String s) {
         String []s1=s.split("<F P=105>");
         if(s1.length!=1) {
@@ -93,10 +104,13 @@ public class ReadFile {
             if(s2[0].charAt(0)==' ') s2[0]=s2[0].substring(1);
             if(s2[0].charAt(s2[0].length()-1)==' ') s2[0]=s2[0].substring(0,s2[0].length()-1);
 
+
+
             Documentt d=new Documentt(s2[0],-1,-1,"",-1);
 
 
-
+            String header=extract_header(s2[1]);
+            d.setHeader(header);
             String []text=s2[1].split("<TEXT>\n");
             if(text.length<2)
                 continue;

@@ -2,11 +2,8 @@ package Modle;
 
 import ViewModel.View_Model;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
+import java.io.*;
+import java.util.*;
 
 public class Model {
 
@@ -18,12 +15,35 @@ public class Model {
     public void start(String corpus_path, String destination,boolean wantToStem) {
         indexer=new Indexer(wantToStem,corpus_path,destination);
         indexer.iniateIndex();
+        searcher=new Searcher(destination,wantToStem);
+    }
+
+    public HashSet<String> getLeng(String dest){
+        HashSet<String> ans=new HashSet<>();
+        try{
+            BufferedReader br1;
+            br1=new BufferedReader(new FileReader(new File(dest + "\\" + "langueges")));
+
+            String line1;
+            while ( (line1 = br1.readLine()) != null )
+                ans.add(line1);
+        }
+        catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return ans;
+    }
+
+    public HashSet<String> getCities(String dest){/////////////////////
+return null;
     }
 
     public ArrayList<Term> showDic() {
         if(searcher==null)
             return null;
-        return indexer.showDic();
+        return searcher.showDic();
     }
 
     public void reset(String destination) {
@@ -62,6 +82,8 @@ public class Model {
         return true;
     }
 
+
+
     public int numOfCities() {
         return indexer.numOfCities();
     }
@@ -69,4 +91,18 @@ public class Model {
     public HashSet<String> languages() {
         return indexer.getLanguages();
     }
+
+    public ArrayList<Map.Entry<Documentt,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment, ArrayList<String> cities_limitation, String corpuspath) {
+        return searcher.Search_single_query(query,stem,semantic_treatment,cities_limitation,corpuspath);
+    }
+
+
+    public LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > Search_files_quries(String query_file_path, boolean stem, boolean semantic, ArrayList<String> cities_limitation, String corpuspath,String destQuery){
+        return searcher.Search_files_quries(query_file_path,stem,semantic,cities_limitation,corpuspath,destQuery);
+    }
+
+    public ArrayList<String> getCitie(){
+        return searcher.getCitie();
+    }
+
 }
