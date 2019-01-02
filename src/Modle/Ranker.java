@@ -6,13 +6,15 @@ import java.awt.List;
 import java.io.*;
 import java.util.*;
 
+
+
 public class Ranker {
     public Map<String,Documentt> documents; //information on every doc
     public Map<String,Term> dictionary;     //inverted index of terms
     public Map<String,City> cities_index;
-    public ArrayList<String> query;
+    public ArrayList<String> query;       //curent query
     private String Posting_And_dictionary_path_in_disk;
-    double avdl;
+    double avdl;    //average size if doc
 
 
 
@@ -27,6 +29,12 @@ public class Ranker {
         this.avdl=avdl();
     }
 
+    /**
+     *
+     * @param stem
+     * @param posting_and_dictionary_path_in_disk
+     * load the dictionary(with or without stem, and the documents info from disk to ram
+     */
     private void Load_Dictionary_and_documets(boolean stem, String posting_and_dictionary_path_in_disk) {
         FileInputStream fis;
         try {
@@ -80,7 +88,10 @@ public class Ranker {
     }
 
 
-
+    /**
+     *
+     * @return the average document size
+     */
     private double avdl() {
         double sum=0;
         for (Map.Entry<String,Documentt> entry : documents.entrySet()) {
@@ -89,7 +100,10 @@ public class Ranker {
         return (sum/documents.size());
     }
 
-
+    /**
+     * the main finftion that get a query, and return the most 50 relevant dicuments, sorted by the scores
+     *
+     */
     public ArrayList<Map.Entry<Documentt,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter){//returns the docNo sorted by rank
         this.query=query;
         HashMap<Documentt,Double> total=new HashMap<>();
@@ -211,6 +225,8 @@ public class Ranker {
 
 
     }
+
+
     private double getMax(Map<String, Double> map) {
         double max=0;
         for(Map.Entry<String,Double> entry: map.entrySet()) {
@@ -221,7 +237,10 @@ public class Ranker {
     }
 
 
-
+    /**
+     *
+     * return 1 if the word exist in the header, otherwise 0
+     */
     private double existInHeader(String docNo, String queryWord) {
         String header=documents.get(docNo).getHeader();
         if(header.equals("-1"))
@@ -238,6 +257,9 @@ public class Ranker {
 
     }
 
+    /**
+     * calculate the final coss sim
+     */
     private HashMap<String,Double> finalCosSim(Map<String, Double> wij_wiq, Map<String, Double> wij_2, Map<String, Double> wiq_2) {
         HashMap<String,Double> ans=new HashMap<>();
         for(Map.Entry<String,Double> entry: wij_wiq.entrySet()){
@@ -249,6 +271,9 @@ public class Ranker {
         return ans;
     }
 
+    /**
+     *  shiklol all the parameters, by theire W of each parameter
+     */
     private ArrayList<Map.Entry<Documentt,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart,Map<String,Double> atHeader,Map<Documentt,Double> total) {
 
         for(Map.Entry<String,Double> entry: bm25.entrySet()) {
@@ -273,12 +298,16 @@ public class Ranker {
 
     }
 
+
     private String [] spliteDocNo(String postiongForWord) {
         String docInfo=postiongForWord.substring(postiongForWord.indexOf(":")+1,postiongForWord.length());
         return docInfo.split(",");
     }
 
 
+    /**
+     * calculate bm25 for one word per document-partial calculate
+     * */
     public double BM25(String word,String AlldocNo,double docLen,double df){
 
         double k=1.3;
@@ -320,6 +349,10 @@ public class Ranker {
             return 1;
     }
 
+    /**
+     *
+     * show the dictionary for the ask of the user in gui
+     */
     public ArrayList<Term> showDic() {
         if(dictionary.size()==0)
             return null;

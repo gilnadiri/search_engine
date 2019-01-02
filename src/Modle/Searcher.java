@@ -19,20 +19,10 @@ public class Searcher {
         this.ranker = new Ranker(postingindisk, false, cities_index);
     }
 
-    public ArrayList<Term> showDic() {
 
-        return ranker.showDic();
-    }
-
-    public ArrayList<String> getCitie() {
-        ArrayList<String> ans = new ArrayList<>();
-        for (Map.Entry<String, City> entry : cities_index.entrySet()) {
-            ans.add(entry.getKey());
-        }
-        return ans;
-    }
-
-
+    /**
+     * return the most 50 relevant documents sorted by rank.
+     */
     public ArrayList<Map.Entry<Documentt, Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment, ArrayList<String> cities_limitation, String corpuspath,String destanation_of_results_file,boolean original_single) {
 
         boolean exist_cities_limitation = false;
@@ -59,6 +49,11 @@ public class Searcher {
 
     }
 
+    /**
+     * save the result in disk, in the format of trec evel
+     * @param destanation_of_results_file
+     * @param results
+     */
     private void save_results_single_query_to_disk(String destanation_of_results_file,ArrayList<Map.Entry<Documentt,Double>> results) {
         FileWriter fos = null;
 
@@ -81,7 +76,11 @@ public class Searcher {
 
     }
 
-
+    /**
+     * for each word in the query-get the most close word in semantic and add it to the query
+     * @param original_query
+     * @return
+     */
     public ArrayList<String> semantic(ArrayList<String> original_query)  {
 
         ArrayList<String> semantic_words=new ArrayList<>();
@@ -121,7 +120,9 @@ public class Searcher {
             return original_query;
         }
 
-
+    /**
+     *  return the 50 most relevant documents, for each query, in the file queries
+     */
     public LinkedHashMap<String, ArrayList<Map.Entry<Documentt, Double>>> Search_files_quries(String query_file_path, boolean stem, boolean semantic, ArrayList<String> cities_limitation, String corpuspath, String destanation_of_results_file) {
         LinkedHashMap<String, ArrayList<Map.Entry<Documentt, Double>>> res = new LinkedHashMap<>();
 
@@ -143,6 +144,11 @@ public class Searcher {
 
     }
 
+    /**
+     * save the resuls to the disk , in the format of trec evel
+     * @param res
+     * @param dest_of_result_file
+     */
     private void write_Results_file_quries_TO_Disk(LinkedHashMap<String, ArrayList<Map.Entry<Documentt, Double>>> res, String dest_of_result_file) {
 
         FileWriter fos = null;
@@ -169,7 +175,11 @@ public class Searcher {
     }
 
 
-
+    /**
+     * return the qury from the tag <title> from the file
+     * @param queries_file
+     * @return
+     */
     private ArrayList<String> extract_quries_from_file(String queries_file) {
         ArrayList<String> queries=new ArrayList<>();
         try {
@@ -197,6 +207,9 @@ public class Searcher {
 
     }
 
+    /**
+     *extract the discription, from the tag
+     */
     private String descrition(String s) {
           String []desc =s.split("<narr>");
           String description=desc[0];
@@ -259,5 +272,18 @@ public class Searcher {
 
     }
 
+
+    public ArrayList<Term> showDic() {
+
+        return ranker.showDic();
+    }
+
+    public ArrayList<String> getCitie() {
+        ArrayList<String> ans = new ArrayList<>();
+        for (Map.Entry<String, City> entry : cities_index.entrySet()) {
+            ans.add(entry.getKey());
+        }
+        return ans;
+    }
 
 }
