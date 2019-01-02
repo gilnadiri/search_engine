@@ -24,12 +24,12 @@ public class View_Model {
         return model.showDic();
     }
 
-    public ArrayList<Map.Entry<Documentt,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment , ArrayList<String> cities_limitation, String corpuspath,String destQuery ){
-        return model.Search_single_query(query,stem,semantic_treatment,cities_limitation,corpuspath,destQuery);
+    public ArrayList<Map.Entry<Documentt,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment , ArrayList<String> cities_limitation, String corpuspath,String destQuery,boolean saveRes ){
+        return model.Search_single_query(query,stem,semantic_treatment,cities_limitation,corpuspath,destQuery,saveRes);
     }
 
-    public LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > Search_files_quries(String query_file_path, boolean stem, boolean semantic, ArrayList<String> cities_limitation, String corpuspath,String destQuery){
-        return model.Search_files_quries(query_file_path,stem,semantic,cities_limitation,corpuspath,destQuery);
+    public LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > Search_files_quries(String query_file_path, boolean stem, boolean semantic, ArrayList<String> cities_limitation, String corpuspath,String destQuery,boolean saveRes){
+        return model.Search_files_quries(query_file_path,stem,semantic,cities_limitation,corpuspath,destQuery,saveRes);
     }
 
 

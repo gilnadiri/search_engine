@@ -6,13 +6,15 @@ import java.awt.List;
 import java.io.*;
 import java.util.*;
 
+
+
 public class Ranker {
     public Map<String,Documentt> documents; //information on every doc
     public Map<String,Term> dictionary;     //inverted index of terms
     public Map<String,City> cities_index;
-    public ArrayList<String> query;
+    public ArrayList<String> query;       //curent query
     private String Posting_And_dictionary_path_in_disk;
-    double avdl;
+    double avdl;    //average size if doc
 
 
 
@@ -27,6 +29,12 @@ public class Ranker {
         this.avdl=avdl();
     }
 
+    /**
+     *
+     * @param stem
+     * @param posting_and_dictionary_path_in_disk
+     * load the dictionary(with or without stem, and the documents info from disk to ram
+     */
     private void Load_Dictionary_and_documets(boolean stem, String posting_and_dictionary_path_in_disk) {
         FileInputStream fis;
         try {
@@ -80,7 +88,10 @@ public class Ranker {
     }
 
 
-
+    /**
+     *
+     * @return the average document size
+     */
     private double avdl() {
         double sum=0;
         for (Map.Entry<String,Documentt> entry : documents.entrySet()) {
@@ -89,8 +100,11 @@ public class Ranker {
         return (sum/documents.size());
     }
 
-
-    public ArrayList<Map.Entry<Documentt,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter){//returns the docNo sorted by rank
+    /**
+     * the main finftion that get a query, and return the most 50 relevant dicuments, sorted by the scores
+     *
+     */
+    public ArrayList<Map.Entry<Documentt,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter,boolean stem){//returns the docNo sorted by rank
         this.query=query;
         HashMap<Documentt,Double> total=new HashMap<>();
         Map<String,Double> BM25=new HashMap();
@@ -103,12 +117,22 @@ public class Ranker {
         for(int i=0;i<query.size();i++) {
             RandomAccessFile raf = null;
             try {
-                raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting", "rw");
-                if(!dictionary.containsKey(query.get(i))) {
+                String word=query.get(i);
+                if(dictionary.containsKey(word.toUpperCase())){
+                    word=word.toUpperCase();
+                }
+                else if(dictionary.containsKey(word.toLowerCase())){
+                    word=word.toLowerCase();
+                }
+                if(stem)
+                    raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting stem", "rw");
+                else
+                    raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting", "rw");
+                if(!dictionary.containsKey(query.get(i).toUpperCase())&&!dictionary.containsKey(query.get(i).toLowerCase())) {
                     //check if the word is at city tags
                     //bring the cities index from searcher
                     //add to finish score with grade 1
-                    if(cities_index.containsKey(query.get(i))) {
+                    if(cities_index.containsKey(query.get(i).toUpperCase())) {//cities index always have upper case
                         //the word exist in city tag but not at text
                         City toAdd=cities_index.get(i);
                         HashMap<String,String> loc=toAdd.getLocation();
@@ -118,7 +142,7 @@ public class Ranker {
                     }
                     continue;
                 }
-                long pointer=dictionary.get(query.get(i)).getPointerToPostings();
+                long pointer=dictionary.get(word).getPointerToPostings();
                 raf.seek(pointer);
                 String postiongForWord=raf.readLine();
                 String [] docsWithWord=spliteDocNo(postiongForWord);
@@ -144,8 +168,13 @@ public class Ranker {
                         AtStart.put(docNo,atStart);
 
                     //bm25
-                    double df=dictionary.get(query.get(i)).getDf();
-                    double bm25=BM25(query.get(i),docsWithWord[j],documents.get(docNo).getDocLength(),df);
+                    double df=dictionary.get(word).getDf();
+                    double bm25=BM25(word,docsWithWord[j],documents.get(docNo).getDocLength(),df);
+                    ArrayList<String> entities=documents.get(docNo).getYeshooyot();
+                    for (int k = 0; k < entities.size(); k++) {
+                        if(entities.get(k).equals(word.toUpperCase()))
+                            bm25+=1;
+                    }
 
                     if(BM25.containsKey(docNo))
                         BM25.put(docNo,BM25.get(docNo)+bm25);
@@ -199,6 +228,8 @@ public class Ranker {
 
 
     }
+
+
     private double getMax(Map<String, Double> map) {
         double max=0;
         for(Map.Entry<String,Double> entry: map.entrySet()) {
@@ -209,7 +240,10 @@ public class Ranker {
     }
 
 
-
+    /**
+     *
+     * return 1 if the word exist in the header, otherwise 0
+     */
     private double existInHeader(String docNo, String queryWord) {
         String header=documents.get(docNo).getHeader();
         if(header.equals("-1"))
@@ -226,6 +260,9 @@ public class Ranker {
 
     }
 
+    /**
+     * calculate the final coss sim
+     */
     private HashMap<String,Double> finalCosSim(Map<String, Double> wij_wiq, Map<String, Double> wij_2, Map<String, Double> wiq_2) {
         HashMap<String,Double> ans=new HashMap<>();
         for(Map.Entry<String,Double> entry: wij_wiq.entrySet()){
@@ -237,6 +274,9 @@ public class Ranker {
         return ans;
     }
 
+    /**
+     *  shiklol all the parameters, by theire W of each parameter
+     */
     private ArrayList<Map.Entry<Documentt,Double>> finalCalculate(Map<String, Double> bm25, Map<String, Double>  cosSim, Map<String, Double> atStart,Map<String,Double> atHeader,Map<Documentt,Double> total) {
 
         for(Map.Entry<String,Double> entry: bm25.entrySet()) {
@@ -261,22 +301,26 @@ public class Ranker {
 
     }
 
+
     private String [] spliteDocNo(String postiongForWord) {
         String docInfo=postiongForWord.substring(postiongForWord.indexOf(":")+1,postiongForWord.length());
         return docInfo.split(",");
     }
 
 
+    /**
+     * calculate bm25 for one word per document-partial calculate
+     * */
     public double BM25(String word,String AlldocNo,double docLen,double df){
 
-        double k=1.2;
-        double b=0.75;
+        double k=1.3;
+        double b=0.5;
         double M=documents.size();
-        double CWQ=calculateWordFreqQuery(word);
+        double CWQ=1;//calculateWordFreqQuery(word);//1?
         double CWD=Double.valueOf(AlldocNo.substring(AlldocNo.indexOf("+")+1,AlldocNo.indexOf("~")));
         double mone=(k+1)*CWD;
         double mechne1=CWD;
-        double mechne2= k* ( 0.25 + (b*(docLen/avdl)) );
+        double mechne2= k* ( 0.5 + (b*(docLen/avdl)) );
         double mechne=mechne1+mechne2;
         double logMone=M+1;
         double logCalculat=(Math.log10(logMone/df));
@@ -288,7 +332,7 @@ public class Ranker {
     private double calculateWordFreqQuery(String word) {
         double ans=0;
         for(int i=0;i<query.size();i++)
-            if(query.get(i).equals(word))
+            if(query.get(i).toUpperCase().equals(word)||query.get(i).toLowerCase().equals(word))
                 ans++;
         return ans;
     }
@@ -308,6 +352,10 @@ public class Ranker {
             return 1;
     }
 
+    /**
+     *
+     * show the dictionary for the ask of the user in gui
+     */
     public ArrayList<Term> showDic() {
         if(dictionary.size()==0)
             return null;
@@ -324,11 +372,6 @@ public class Ranker {
 
         return list;
     }
-
-
-
-
-
 
 
 

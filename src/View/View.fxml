@@ -11,6 +11,7 @@
 
 <Pane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="690.0" prefWidth="811.0" xmlns="http://javafx.com/javafx/8.0.121" xmlns:fx="http://javafx.com/fxml/1" fx:controller="View.Controller">
    <children>
+      <CheckBox fx:id="saveResults" layoutX="682.0" layoutY="412.0" mnemonicParsing="false" text="Save results" />
       <Button fx:id="browse_dest" layoutX="547.0" layoutY="142.0" mnemonicParsing="false" onAction="#browseDest" prefHeight="31.0" prefWidth="122.0" text="Browse...">
          <font>
             <Font size="15.0" />
@@ -86,7 +87,7 @@
             <Font name="Comic Sans MS" size="23.0" />
          </font>
       </Label>
-      <Button fx:id="browse_QueriesFile" layoutX="557.0" layoutY="330.0" mnemonicParsing="false" onAction="#browseQuery" prefHeight="31.0" prefWidth="122.0" text="Browse...">
+      <Button fx:id="browse_QueriesFile" layoutX="552.0" layoutY="330.0" mnemonicParsing="false" onAction="#browseQuery" prefHeight="31.0" prefWidth="122.0" text="Browse...">
          <font>
             <Font size="15.0" />
          </font>
@@ -96,7 +97,7 @@
             <Font name="Comic Sans MS" size="28.0" />
          </font>
       </Button>
-      <Button fx:id="folderDialog" layoutX="557.0" layoutY="410.0" mnemonicParsing="false" onAction="#folderDialog" prefHeight="31.0" prefWidth="122.0" text="Folder Dialog">
+      <Button fx:id="folderDialog" layoutX="552.0" layoutY="410.0" mnemonicParsing="false" onAction="#folderDialog" prefHeight="31.0" prefWidth="122.0" text="Folder Dialog">
          <font>
             <Font size="15.0" />
          </font>
