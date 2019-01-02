@@ -51,8 +51,6 @@ public class Cities {
                     ans[2]=val.getAsString();
                 }
             }
-
-
         }
         return ans;
     }

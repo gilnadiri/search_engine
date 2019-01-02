@@ -42,6 +42,7 @@ public class Controller {
     public javafx.scene.control.TextArea resultPath;
     public javafx.scene.control.CheckBox stemming;
     public javafx.scene.control.CheckBox semantic;
+    public javafx.scene.control.CheckBox saveResults;
     public javafx.scene.control.ChoiceBox language;
     public ObservableList<String> list= FXCollections.observableArrayList();
     public ObservableList<String> listCity= FXCollections.observableArrayList();
@@ -61,6 +62,7 @@ public class Controller {
     public boolean loadFirst=true;
     public ArrayList<String> citiesWhomFilterd;
     public CheckComboBox cities;
+    public boolean stemPressed;
 
 
     public void initializ(){
@@ -118,7 +120,9 @@ public class Controller {
         String single=singleQuery.getText();
         String queryFile=queriesFile.getText();
         String destQuery=resultPath.getText();
-        if(destQuery.equals("")) {
+        boolean saveRes=this.saveResults.isSelected();
+
+        if(destQuery.equals("")&&saveRes) {
             showAlert("Please choose directory where the results will be saved.");
             return;
         }
@@ -132,7 +136,15 @@ public class Controller {
             return;
         }
 
-        boolean wantToStem=this.stemming.isSelected();
+        boolean wantToStem=stemPressed;
+        if(wantToStem&&!stemming.isSelected()) {
+            showAlert("Pay attention! the dictionary you loaded was load with stemming.\nNow you are trying to search with no stemming\nPlease try again");
+            return;
+        }
+        if(wantToStem!=stemming.isSelected()) {
+            showAlert("Pay attention! the dictionary you loaded was load with no stemming.\nNow you are trying to search with stemming\nPlease try again");
+            return;
+        }
         boolean semantic=this.semantic.isSelected();
         ArrayList<String> cities_limitation=new ArrayList<>();
         if(cities.getCheckModel().getCheckedItems()!=null){
@@ -143,7 +155,7 @@ public class Controller {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setContentText("Just a few minutes, We are working on it....");
             alert.show();
-            ArrayList<Map.Entry<Documentt,Double>> ansSingle=viewModel.Search_single_query(single,wantToStem,semantic,cities_limitation,corpus,destQuery);
+            ArrayList<Map.Entry<Documentt,Double>> ansSingle=viewModel.Search_single_query(single,wantToStem,semantic,cities_limitation,corpus,destQuery,saveRes);
             alert.close();
             openResultsForSingle(ansSingle);
         }
@@ -151,7 +163,7 @@ public class Controller {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setContentText("Just a few minutes, We are working on it....");
             alert.show();
-            LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > ansFile=viewModel.Search_files_quries(queryFile,wantToStem,semantic,cities_limitation,corpus,destQuery);
+            LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > ansFile=viewModel.Search_files_quries(queryFile,wantToStem,semantic,cities_limitation,corpus,destQuery,saveRes);
             alert.close();
             openResultsForMulti(ansFile);
         }
@@ -437,6 +449,7 @@ public class Controller {
         else loadFirst=false;
 
         boolean wantToStem=this.stemming.isSelected();
+        stemPressed=wantToStem;
         String destination=this.posting_destanation_path.getText();
         if(destination.equals(""))
             showAlert("Pleas enter the path where you saved your dictionary at last launch");

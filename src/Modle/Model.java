@@ -15,7 +15,7 @@ public class Model {
     public void start(String corpus_path, String destination,boolean wantToStem) {
         indexer=new Indexer(wantToStem,corpus_path,destination);
         indexer.iniateIndex();
-        searcher=new Searcher(destination,wantToStem);
+        //searcher=new Searcher(destination,wantToStem);
     }
 
     public HashSet<String> getLeng(String dest){
@@ -86,13 +86,13 @@ public class Model {
         return indexer.getLanguages();
     }
 
-    public ArrayList<Map.Entry<Documentt,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment, ArrayList<String> cities_limitation, String corpuspath,String destQuery) {
-        return searcher.Search_single_query(query,stem,semantic_treatment,cities_limitation,corpuspath,destQuery,true);
+    public ArrayList<Map.Entry<Documentt,Double>> Search_single_query(String query, boolean stem, boolean semantic_treatment, ArrayList<String> cities_limitation, String corpuspath,String destQuery,boolean saveRes) {
+        return searcher.Search_single_query(query,stem,semantic_treatment,cities_limitation,corpuspath,destQuery,true,saveRes);
     }
 
 
-    public LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > Search_files_quries(String query_file_path, boolean stem, boolean semantic, ArrayList<String> cities_limitation, String corpuspath,String destQuery){
-        return searcher.Search_files_quries(query_file_path,stem,semantic,cities_limitation,corpuspath,destQuery);
+    public LinkedHashMap<String, ArrayList<Map.Entry<Documentt,Double>> > Search_files_quries(String query_file_path, boolean stem, boolean semantic, ArrayList<String> cities_limitation, String corpuspath,String destQuery,boolean saveRes){
+        return searcher.Search_files_quries(query_file_path,stem,semantic,cities_limitation,corpuspath,destQuery,saveRes);
     }
 
     public ArrayList<String> getCitie(){

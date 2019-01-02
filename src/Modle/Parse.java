@@ -101,7 +101,7 @@ public class Parse {
     }
 
     private String[] seperatesToWords (String text){
-        String[] arr = text.split("[ \n\t\"*&<>(){}+#@?!:`;^|=~]");
+        String[] arr = text.split("[ \n\t\"*&<>(){}+#@?!:`;^|=~ן¿½_]");
         return arr;
     }
 
@@ -508,6 +508,8 @@ public class Parse {
             else
                 w2=arr[1];
             justAdd(w1+"-"+w2,i);
+            justAdd(w1,i);
+            justAdd(w2,i);
         }
         return returnValue;
     }
@@ -574,6 +576,9 @@ public class Parse {
     }
 
     private void justAdd(String toAdd,int i) {
+        if(toAdd.length()==0) return;
+        if(toAdd.charAt(0)=='-') toAdd=toAdd.substring(1,toAdd.length());
+        if(toAdd.length()==0) return;
         if(toAdd.length()>2&&toAdd.charAt(0)=='-'&&(toAdd.charAt(1)=='\''||toAdd.charAt(1)=='-'||toAdd.charAt(1)=='/'||toAdd.charAt(1)=='%'||toAdd.charAt(1)=='$')) {
             toAdd = toAdd.substring(2, toAdd.length());
             if(Character.isUpperCase(toAdd.charAt(0)))
@@ -612,10 +617,22 @@ public class Parse {
                 }
             }
 
+
             if (Tokens.containsKey(add))
                Tokens.get(add).setFrequentInDoc(Tokens.get(add).frequentInDoc+1);
-            else
-                Tokens.put(add,new TokenInfo(1,atStart(i)));
+            else {
+                if(add.length()==0) return;
+                if((add.charAt(0)=='-'&&!isNumeric(add))||add.charAt(0)=='/'){
+                    add=add.substring(1,add.length());
+                }
+                if(add.length()==0) return;
+                if(Character.isUpperCase(add.charAt(0)))
+                    add=add.toUpperCase();
+
+                if(Character.isUpperCase(add.charAt(0)))
+                    add=add.toUpperCase();
+                Tokens.put(add, new TokenInfo(1, atStart(i)));
+            }
         }
         catch (IndexOutOfBoundsException e){
 

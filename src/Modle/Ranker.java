@@ -104,7 +104,7 @@ public class Ranker {
      * the main finftion that get a query, and return the most 50 relevant dicuments, sorted by the scores
      *
      */
-    public ArrayList<Map.Entry<Documentt,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter){//returns the docNo sorted by rank
+    public ArrayList<Map.Entry<Documentt,Double>> Rank(ArrayList<String> query,boolean filter,HashSet<String> docsFilter,boolean stem){//returns the docNo sorted by rank
         this.query=query;
         HashMap<Documentt,Double> total=new HashMap<>();
         Map<String,Double> BM25=new HashMap();
@@ -124,7 +124,10 @@ public class Ranker {
                 else if(dictionary.containsKey(word.toLowerCase())){
                     word=word.toLowerCase();
                 }
-                raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting", "rw");
+                if(stem)
+                    raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting stem", "rw");
+                else
+                    raf = new RandomAccessFile(Posting_And_dictionary_path_in_disk+"\\"+"final_posting", "rw");
                 if(!dictionary.containsKey(query.get(i).toUpperCase())&&!dictionary.containsKey(query.get(i).toLowerCase())) {
                     //check if the word is at city tags
                     //bring the cities index from searcher
@@ -278,7 +281,7 @@ public class Ranker {
 
         for(Map.Entry<String,Double> entry: bm25.entrySet()) {
             String doc=entry.getKey();
-            double newVal=(entry.getValue()*1)+(cosSim.get(doc)*0)+(atStart.get(doc)*0)+(atHeader.get(doc)*0);
+            double newVal=(entry.getValue()*0.97)+(cosSim.get(doc)*0.01)+(atStart.get(doc)*0.01)+(atHeader.get(doc)*0.01);
             total.put(documents.get(doc),newVal);
         }
 
@@ -369,11 +372,6 @@ public class Ranker {
 
         return list;
     }
-
-
-
-
-
 
 
 
