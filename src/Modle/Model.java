@@ -61,7 +61,7 @@ public class Model {
         if(wantToStem) {
             File docs = new File(destination + "\\" + "docs stem");
             File dictionary = new File(destination + "\\" + "dictionary stem");
-            File cities = new File(destination + "\\" + "cities stem");
+            File cities = new File(destination + "\\" + "cities");
             if (!docs.exists()||!dictionary.exists()||!cities.exists())
                 return false;
         }

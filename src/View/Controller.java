@@ -27,6 +27,8 @@ import org.controlsfx.control.CheckComboBox;
 
 import javax.xml.bind.Element;
 import java.awt.*;
+import java.awt.MenuBar;
+import java.awt.MenuItem;
 import java.awt.event.ActionEvent;
 import java.io.File;
 import java.util.*;
@@ -59,17 +61,16 @@ public class Controller {
     public File file;
     public FileChooser fileChooser;
     public ListView listView;
-    public boolean loadFirst=true;
     public ArrayList<String> citiesWhomFilterd;
-    public CheckComboBox cities;
+    public MenuButton cities;
     public boolean stemPressed;
+    private ArrayList<String> pickedCity;
 
 
     public void initializ(){
         showDic.setDisable(true);
-        reset.setDisable(true);
         search.setDisable(true);
-
+        pickedCity=new ArrayList<>();
     }
 
     private void showAlert(String alertMessage) {
@@ -109,7 +110,6 @@ public class Controller {
             double time=(finishTime - startTime)/1000000.0/1000;
             showAlert("The dictionary build successfully!\n It took: "+ time +"sec.\n" +"Number of terms in dictionary: "+ Terms+"\n"+"Number of documents indexed: "+N+"\nNumber of cities in cities index: "+ cities);
             showDic.setDisable(false);
-            reset.setDisable(false);
             search.setDisable(false);
 
         }
@@ -146,10 +146,15 @@ public class Controller {
             return;
         }
         boolean semantic=this.semantic.isSelected();
+        ArrayList<String> pick=new ArrayList<>();
         ArrayList<String> cities_limitation=new ArrayList<>();
-        if(cities.getCheckModel().getCheckedItems()!=null){
-            cities_limitation.addAll(cities.getCheckModel().getCheckedItems());
-        }
+//        for(javafx.scene.control.MenuItem m: cities.getItems()){
+//            CheckMenuItem c=(CheckMenuItem) m;
+//            if(c.isSelected())
+//                cities_limitation.add(m.getText());
+//            c.setSelected(false);
+//        }
+
 
         if(!single.equals("")){
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -443,11 +448,6 @@ public class Controller {
     }
 
     public void loadDic(){
-        if(loadFirst==false) {
-            showAlert("The previous dictionary will be replace with a new one.");
-        }
-        else loadFirst=false;
-
         boolean wantToStem=this.stemming.isSelected();
         stemPressed=wantToStem;
         String destination=this.posting_destanation_path.getText();
@@ -466,7 +466,6 @@ public class Controller {
                 alert.close();
                 showAlert("Dictionary loaded successfully");
                 showDic.setDisable(false);
-                reset.setDisable(false);
                 search.setDisable(false);
                 HashSet<String> leng= viewModel.getLen(destination);
                 Iterator<String> itr = leng.iterator();
@@ -485,7 +484,11 @@ public class Controller {
                     listCity.add(c);
                 }
                 listCity.sort(String::compareToIgnoreCase);
-                cities.getItems().addAll(listCity);
+                for (String c:listCity) {
+                    CheckMenuItem checkMenuItem=new CheckMenuItem(c);
+                    cities.getItems().add(checkMenuItem);
+                }
+                //cities.getItems().addAll(listCity);
             }
 
         }

@@ -12,6 +12,7 @@ public class Searcher {
 
     private Ranker ranker;
     private HashMap<String, City> cities_index;
+    private Parse parser;
 
     public Searcher(String postingindisk, boolean stem) {
         this.cities_index = new HashMap<>();

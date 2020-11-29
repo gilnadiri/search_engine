@@ -36,7 +36,7 @@ public class Documentt implements Serializable {
 
     }
 
-    public Documentt(String doc_Name, int doc_max_tf, int doc_uniqe_words, String doc_City, int docLength) {
+        public Documentt(String doc_Name, int doc_max_tf, int doc_uniqe_words, String doc_City, int docLength) {
         Doc_Name = doc_Name;
         Doc_max_tf = doc_max_tf;
         Doc_uniqe_words = doc_uniqe_words;

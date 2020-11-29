@@ -8,7 +8,7 @@ public class main {
 
 
 
-        test3();
+       // test3();
 
         //test4();
         //searcher.Search_files_quries("C:\\Users\\gil nadiri\\Desktop\\dest\\queries.txt",false,false,new ArrayList<String>(),"C:\\Users\\gil nadiri\\Desktop\\אחזור עבודה\\corpus");
@@ -20,12 +20,12 @@ public class main {
 
 
 
-    private static void test3() {
-        Searcher searcher=new Searcher("C:\\Users\\hoday\\Desktop\\d",true);
-        searcher.Search_files_quries("C:\\Users\\hoday\\Desktop\\d\\queries.txt",true,false,new ArrayList<String>(),"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\corpus","C:\\Users\\hoday\\Desktop\\results",true);
-        //searcher.Search_single_query("Falkland petroleum exploration",false,true,new ArrayList<String>(),"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\corpus","C:\\Users\\hoday\\Desktop\\results",true,false);
-        int i=0;
-    }
+//    private static void test3() {
+//        Searcher searcher=new Searcher("C:\\Users\\hoday\\Desktop\\d",true);
+//        searcher.Search_files_quries("C:\\Users\\hoday\\Desktop\\d\\queries.txt",true,false,new ArrayList<String>(),"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\corpus","C:\\Users\\hoday\\Desktop\\results",true);
+//        //searcher.Search_single_query("Falkland petroleum exploration",false,true,new ArrayList<String>(),"C:\\Users\\hoday\\hodaya\\שנה ג\\אחזור\\corpus","C:\\Users\\hoday\\Desktop\\results",true,false);
+//        int i=0;
+//    }
 
 
     private static void relevant_i_back_from_all_the_relevant(ArrayList<Map.Entry<Documentt, Double>> myscores, ArrayList<String> judjescore) {
